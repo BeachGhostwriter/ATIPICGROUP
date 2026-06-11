@@ -260,11 +260,12 @@ nav.on-light .hamburger span { background: var(--blue-800); }
 .mod-body p { margin-bottom: 0.75rem; }
 .mod-body strong { color: var(--text); }
 
-/* coloured top border variations */
-.mb-b::before { content: ''; display: block; height: 3px; background: var(--blue-300); border-radius: 3px 3px 0 0; margin: -2.5rem -2rem 2rem; }
-.mb-s::before { content: ''; display: block; height: 3px; background: var(--sage-300); border-radius: 3px 3px 0 0; margin: -2.5rem -2rem 2rem; }
-.mb-w::before { content: ''; display: block; height: 3px; background: var(--warm-300); border-radius: 3px 3px 0 0; margin: -2.5rem -2rem 2rem; }
-.mb-r::before { content: ''; display: block; height: 3px; background: var(--rose-300); border-radius: 3px 3px 0 0; margin: -2.5rem -2rem 2rem; }
+/* coloured top border variations — span both grid columns so they don't disrupt mod-block's layout */
+.mb-b::before, .mb-s::before, .mb-w::before, .mb-r::before { content: ''; display: block; grid-column: 1 / -1; height: 3px; border-radius: 3px 3px 0 0; margin: -2.5rem -2rem 2rem; }
+.mb-b::before { background: var(--blue-300); }
+.mb-s::before { background: var(--sage-300); }
+.mb-w::before { background: var(--warm-300); }
+.mb-r::before { background: var(--rose-300); }
 
 /* ════════ ABOUT PAGE ════════ */
 .values-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-top: 1rem; }
