@@ -28,3 +28,27 @@
     });
   });
 })();
+
+/* contact form -> open the user's email client with details pre-filled */
+function sendContactEmail(e){
+  e.preventDefault();
+  const form = e.target;
+  const val = name => (form.elements[name] && form.elements[name].value.trim()) || '';
+
+  const fname = val('First Name');
+  const lname = val('Last Name');
+  const email = val('Email');
+  const phone = val('Phone');
+  const website = val('Website');
+  const role = val('Role');
+  const message = val('Message');
+
+  const subject = `Enquiry from AT-IPIC website - ${fname} ${lname}`.trim();
+  let body = `Name: ${fname} ${lname}\nEmail: ${email}\n`;
+  if(phone) body += `Phone: ${phone}\n`;
+  if(website) body += `Website: ${website}\n`;
+  if(role) body += `Role: ${role}\n`;
+  body += `\nMessage:\n${message}`;
+
+  window.location.href = `mailto:Adrian.Clements@atipicgroup.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}

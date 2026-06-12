@@ -120,7 +120,7 @@
       <!-- RIGHT: Contact Form -->
       <div class="ct-form-box fi d1">
         <h3 class="ct-form-title">Send a Message</h3>
-        <form action="mailto:Adrian.Clements@atipicgroup.com" method="post" enctype="text/plain">
+        <form onsubmit="sendContactEmail(event)">
           <div class="f-row">
             <div class="f-group">
               <label for="fname">First Name *</label>
@@ -163,7 +163,7 @@
             <textarea id="message" name="Message" placeholder="Tell us about your business challenge, what you'd like to explore, or any questions you have about our methodology..." required></textarea>
           </div>
           <button type="submit" class="btn-submit">Send Message →</button>
-          <p style="font-size:0.75rem;color:var(--soft);text-align:center;margin-top:1rem">This will open your email client. Alternatively, email Adrian directly at Adrian.Clements@atipicgroup.com</p>
+          <p style="font-size:0.75rem;color:var(--soft);text-align:center;margin-top:1rem">This will open your email client with your details pre-filled. Alternatively, email Adrian directly at Adrian.Clements@atipicgroup.com</p>
         </form>
       </div>
 
