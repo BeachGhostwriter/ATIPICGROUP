@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christobal Portal | AT-IPIC Group</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="sitenav">
+  <div class="nav-wrap">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/img/logo-mark-white.png" alt="AT-IPIC" class="logo-default">
+      <img src="assets/img/logo-mark-blue.png" alt="AT-IPIC" class="logo-onlight">
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li class="has-drop"><a href="about.html">About Us</a>
+        <ul class="drop">
+          <li><a href="about.html#who-we-are">Who We Are</a></li>
+          <li><a href="about.html#our-values">Our Values</a></li>
+          <li><a href="about.html#our-difference">Our Difference</a></li>
+        </ul>
+      </li>
+      <li class="has-drop"><a href="#">Making a Difference</a>
+        <ul class="drop" style="min-width:270px">
+          <li><a href="index.html#atlas">The ATLAS System</a></li>
+          <li><a href="index.html#focus-areas">2 Business Focus Areas</a></li>
+          <hr>
+          <li class="drop-head">5 Processes</li>
+          <li><a href="5-processes.html#piloting">01 · Piloting</a></li>
+          <li><a href="5-processes.html#strategic-planning">02 · Strategic Planning &amp; Alignment</a></li>
+          <li><a href="5-processes.html#consolidation">03 · Consolidation &amp; Review</a></li>
+          <li><a href="5-processes.html#action-valuation">04 · Action Valuation &amp; Execution</a></li>
+          <li><a href="5-processes.html#insight">05 · Insight</a></li>
+          <hr>
+          <li class="drop-head">7 Modules</li>
+          <li><a href="7-modules.html#module-1">01 · Strategic Direction</a></li>
+          <li><a href="7-modules.html#module-2">02 · 360° Brainstorming</a></li>
+          <li><a href="7-modules.html#module-3">03 · Establishing Context</a></li>
+          <li><a href="7-modules.html#module-4">04 · Stabilising Production</a></li>
+          <li><a href="7-modules.html#module-5">05 · Aligning with Controlling</a></li>
+          <li><a href="7-modules.html#module-6">06 · Valorisation</a></li>
+          <li><a href="7-modules.html#module-7">07 · Lighthouse</a></li>
+        </ul>
+      </li>
+      <li><a href="christobal.html">Christobal</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="drawer">
+  <button class="mobile-close" id="drawerClose">✕</button>
+  <a href="index.html">Home</a>
+  <a href="about.html">About Us</a>
+  <a href="5-processes.html">5 Processes</a>
+  <a href="7-modules.html">7 Modules</a>
+  <a href="christobal.html">Christobal</a>
+  <a href="contact.html" style="margin-top:1.5rem;background:var(--blue-300);color:var(--blue-800);border-radius:50px;text-align:center;font-weight:600;padding:0.75rem 1rem;">Contact Us</a>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="breadcrumb-sep">›</span>
+      <span>Christobal</span>
+    </div>
+    <h1>Christobal Portal</h1>
+    <p>A secure, members-only portal for the Christobal risk &amp; performance assessment platform.</p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<section class="section section-white" id="christobal-login-section">
+  <div class="wrap" style="max-width:480px">
+    <div class="ct-form-box fi">
+      <h3 class="ct-form-title">Sign In</h3>
+      <form id="christobalLoginForm">
+        <div class="f-group">
+          <label for="cb-email">Email Address</label>
+          <input type="email" id="cb-email" name="email" placeholder="your@email.com" required autocomplete="username">
+        </div>
+        <div class="f-group">
+          <label for="cb-password">Password</label>
+          <input type="password" id="cb-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <p id="christobalLoginError" style="display:none;color:#c0392b;font-size:0.85rem;margin-bottom:1rem"></p>
+        <button type="submit" class="btn-submit">Sign In →</button>
+        <p style="font-size:0.75rem;color:var(--soft);text-align:center;margin-top:1rem">Access is restricted to authorised AT-IPIC and ArcelorMittal team members. Contact <a href="mailto:Adrian.Clements@atipicgroup.com?subject=Christobal%20Portal%20Access">Adrian.Clements@atipicgroup.com</a> for an account.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- PROTECTED CONTENT -->
+<section class="section section-white" id="christobal-content-section" style="display:none">
+  <div class="wrap">
+    <div class="text-center mb-4">
+      <span class="s-tag fi">Christobal</span>
+      <h2 class="s-h fi d1">Risk &amp; Performance Assessment Platform</h2>
+      <p class="s-p max-580 mx-auto fi d2">Christobal is the dedicated risk-management and performance-assessment platform developed for ArcelorMittal sites, covering site dashboards, recommendations, ratings and vulnerability analysis across the asset portfolio.</p>
+    </div>
+
+    <div class="card fi d1" style="max-width:720px;margin:0 auto;text-align:center">
+      <div style="font-size:2rem;margin-bottom:1rem">🚧</div>
+      <h4 class="card-h">Application In Development</h4>
+      <p class="card-p">The Christobal application is currently being prepared for hosting. Once it is live, the link below will take you directly to the platform.</p>
+      <div style="margin-top:1.5rem">
+        <a href="#" class="btn btn-solid" id="christobalAppLink" style="pointer-events:none;opacity:0.5">Open Christobal →</a>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:2.5rem" class="fi">
+      <button type="button" id="christobalLogoutBtn" class="btn btn-outline-dark">Sign Out</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-wrap">
+    <div class="ft-top">
+      <div>
+        <a href="index.html" class="ft-logo"><img src="assets/img/logo-mark-white.png" alt="AT-IPIC"></a>
+        <div class="ft-tagline">Risk management-based performance transformation and enhancement</div>
+      </div>
+      <div>
+        <div class="ft-col-h">About</div>
+        <ul class="ft-links">
+          <li><a href="about.html#who-we-are">Who We Are</a></li>
+          <li><a href="about.html#our-values">Our Values</a></li>
+          <li><a href="about.html#our-difference">Our Difference</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ft-col-h">Methodology</div>
+        <ul class="ft-links">
+          <li><a href="index.html#atlas">ATLAS System</a></li>
+          <li><a href="5-processes.html">The 5 Processes</a></li>
+          <li><a href="7-modules.html">The 7 Modules</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ft-col-h">Contact</div>
+        <a href="mailto:Adrian.Clements@atipicgroup.com" class="ft-contact-item">✉ Adrian.Clements@atipicgroup.com</a>
+        <a href="tel:+4917223467050" class="ft-contact-item">📞 +49 172 2346705</a>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <div class="ft-copy">© 2025 AT-IPIC Group. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="_nav.js"></script>
+<script>
+  (function(){
+    const loginSection = document.getElementById('christobal-login-section');
+    const contentSection = document.getElementById('christobal-content-section');
+    const form = document.getElementById('christobalLoginForm');
+    const errorEl = document.getElementById('christobalLoginError');
+    const logoutBtn = document.getElementById('christobalLogoutBtn');
+
+    function showContent(){
+      loginSection.style.display = 'none';
+      contentSection.style.display = '';
+    }
+    function showLogin(){
+      contentSection.style.display = 'none';
+      loginSection.style.display = '';
+    }
+
+    // Check existing session on load
+    fetch('/api/christobal/session')
+      .then(r => r.json())
+      .then(data => { if (data.authenticated) showContent(); else showLogin(); })
+      .catch(() => showLogin());
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      const email = document.getElementById('cb-email').value.trim();
+      const password = document.getElementById('cb-password').value;
+
+      fetch('/api/christobal/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok && data.ok) {
+            form.reset();
+            showContent();
+          } else {
+            errorEl.textContent = (data && data.error) || 'Sign in failed. Please try again.';
+            errorEl.style.display = '';
+          }
+        })
+        .catch(() => {
+          errorEl.textContent = 'Sign in failed. Please try again.';
+          errorEl.style.display = '';
+        });
+    });
+
+    logoutBtn.addEventListener('click', function(){
+      fetch('/api/christobal/logout', { method: 'POST' }).finally(showLogin);
+    });
+  })();
+</script>
+</body>
+</html>
