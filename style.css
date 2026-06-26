@@ -56,7 +56,7 @@ nav.on-light {
   padding: 0.7rem 2rem;
 }
 .nav-wrap { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-.nav-logo { display: flex; align-items: center; height: 34px; text-decoration: none; }
+.nav-logo { display: flex; align-items: center; height: 68px; text-decoration: none; }
 .nav-logo img { height: 100%; width: auto; display: block; }
 .nav-logo .logo-onlight { display: none; }
 nav.on-light .nav-logo .logo-default { display: none; }
@@ -310,7 +310,7 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
 .ft-wrap { max-width: 1240px; margin: 0 auto; }
 .ft-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
 .ft-logo { display: block; }
-.ft-logo img { height: 38px; width: auto; display: block; }
+.ft-logo img { height: 76px; width: auto; display: block; }
 .ft-tagline { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.4rem; line-height: 1.55; max-width: 200px; }
 .ft-col-h { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue-300); margin-bottom: 1rem; }
 .ft-links { list-style: none; }
