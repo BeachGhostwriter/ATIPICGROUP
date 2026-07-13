@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core Portal | AT-IPIC Group</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav id="sitenav">
+  <div class="nav-wrap">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/img/logo-mark-white.png" alt="AT-IPIC" class="logo-default">
+      <img src="assets/img/logo-mark-blue.png" alt="AT-IPIC" class="logo-onlight">
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="research-development.html">Research &amp; Development</a></li>
+      <li><a href="core.html">Core</a></li>
+      <li><a href="neptune.html">Neptune</a></li>
+      <li><a href="christobal.html">Christobal</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="drawer">
+  <button class="mobile-close" id="drawerClose">✕</button>
+  <a href="index.html">Home</a>
+  <a href="about.html">About Us</a>
+  <a href="research-development.html">Research &amp; Development</a>
+  <a href="core.html">Core</a>
+  <a href="neptune.html">Neptune</a>
+  <a href="christobal.html">Christobal</a>
+  <a href="contact.html" style="margin-top:1.5rem;background:var(--blue-300);color:var(--blue-800);border-radius:50px;text-align:center;font-weight:600;padding:0.75rem 1rem;">Contact Us</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">›</span><span>Core</span></div>
+    <h1>Core Portal</h1>
+    <p>Secure access for Core reporting and advanced decision views.</p>
+  </div>
+</div>
+
+<section class="section section-white" id="core-login-section">
+  <div class="wrap" style="max-width:480px">
+    <div class="ct-form-box fi">
+      <h3 class="ct-form-title">Sign In</h3>
+      <form id="coreLoginForm">
+        <div class="f-group">
+          <label for="core-email">Email Address</label>
+          <input type="email" id="core-email" name="email" placeholder="your@email.com" required autocomplete="username">
+        </div>
+        <div class="f-group">
+          <label for="core-password">Password</label>
+          <input type="password" id="core-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <p id="coreLoginError" style="display:none;color:#c0392b;font-size:0.85rem;margin-bottom:1rem"></p>
+        <button type="submit" class="btn-submit">Sign In →</button>
+        <p style="font-size:0.78rem;color:var(--mid);text-align:center;margin-top:0.85rem">Admin login remains the existing account already defined in your current user table.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section section-white" id="core-content-section" style="display:none">
+  <div class="wrap">
+    <div class="text-center mb-3">
+      <span class="s-tag fi">Core</span>
+      <h2 class="s-h fi d1">Core Reporting Portal</h2>
+      <p class="s-p max-580 mx-auto fi d2">Manager and Expert reporting views include the latest supplied chart image as requested.</p>
+    </div>
+
+    <div class="card fi d1" style="max-width:840px;margin:0 auto 1.5rem;text-align:center">
+      <h4 class="card-h">Role View</h4>
+      <p class="card-p">Select role to view authorised reporting content.</p>
+      <div style="margin-top:1rem;display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap">
+        <button type="button" class="app-role-tab" data-core-role="manager">Manager</button>
+        <button type="button" class="app-role-tab" data-core-role="expert">Expert</button>
+        <button type="button" class="app-role-tab" data-core-role="viewer">Viewer</button>
+      </div>
+    </div>
+
+    <div class="card fi d2 app-role-section" id="core-manager" style="max-width:980px;margin:0 auto 1.5rem">
+      <h4 class="card-h">Manager Reporting</h4>
+      <p class="card-p" style="margin-bottom:1rem">Manager dashboard image included in reporting page.</p>
+      <img alt="Manager reporting chart" style="width:100%;height:auto;border-radius:14px;border:1px solid var(--border)" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABCCAYAAACl4qNCAAAAAXNSR0ICQMB9xQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUATWljcm9zb2Z0IE9mZmljZX/tNXEAAAeySURBVHja7Zp5bBRVHMfHxERSSdTAH9CwGqLEqBjSbpE/CGoMNAUKMRwxUDYSW4s0dWlppQeULZcUW9CGsEEUAS0GELGYkigQgkKjFsrVtIVeFHpsj22LbOmx3e3XeW+v2enMnrOV423ybXZn5l2/z/v93nu/Kbdp0yaO6eETMwIDw8TAMDBMTySYyspKGAwGdHR0oK2tzQfZnm1paUFpaSmSkpJSGJgQqKqqCsPDw/D3MzQ0BFLWDiedgQkBmMHBQWpsAmh42AqrVVoWi8Up8qmrq0NNTQ1u3Lhh5eGkchz3FAMTEjByUCxUYjCNjbfR2tpKf1+/fh3JyckphYWFTzMwCoORgyIEYtMQfZ54S0NDA/3e09ODCxcukLC27lGB89CDGRgYkAUjBcUBprq6GocP/8DrMIqKilBcXIySkhJotdrJeXl5YQxMyMBIQyHfyeLv+LS3t1NI5eXlOHHixLBGo3kvIyNjIgOjOBiLZAgjMIiMD4ZQcPY2/90Ms9nstqvj67PGxcXN48GoGBgFwWRt3YnMLflYqkmgWrIiAe9/8CEWLtUgKX0DktLWo4sH8+qeWlyqbaVgbCJ1DMNkMhEwc/lwNomBUQyMhYdSgObWNiyJS0DClVZ8XNaM1RUGrCpvxZ2mZnySmgUrv3t7fX8LYk/dh6l/kIdiEwHT3d3NwCgHpp+GIxKuMjbnY13uF1i8/CMUll5CQdk1ZJ+tRuKOU1iVksV7TTaGLFZMP9CE6ecGEXfOwJcfpDs7Ukd3dxcDoxSY/n4XmM90O5C28XMsWLIC/85biFszV2Ltrg04lRKB+E/TsTo1E90DVrx8sB79vKfl/dmE8IJ/eDAD9BzEwIQEzBDSN25HU4sBsYuXQz1jJiLemolp6hmYGjEdt+80IT45DfcGrQg/WIeKxjb0DVowTnfeCaari4FREEwfNSrZca3dsA0p2Vswf9EyTDliwuSferFk8wUsjU/AV/pvsK2gEP1mC1QHanGtwUDD2ris03SdIpuHri4jA6MkGGJUAiZ1/VbqMTELlyLqx06oD/Qg61wPDlbex7HKbuT/0YCS+l6E62/CYLyHby93YXxqsR2MhYFREkxfnwvMmuzN0GbqMGf+ImQXH4L294u40tCJ/JIKvHasEy/9bIKK96TwwiqYHjzAvH2V2Pz9b3QDwcCEDIwZ2gwd7ja34t3oBViz61es3nsSf1+uwCv6Wow/bsKzhzoRpr+LCdsvo6KhBZfqDLQ8AxMyMBYKJnndRnqQfGfOfKq3Z8/H8V9OYupJE8L2NiKssAZjtt/E81kXcauxmQJxiNRhNDIwioIhW2XXKd51aCTnE7LjmrXvGsKKuzHmyyY8k3kR6ftPu0EhOzuyqzMaOxmY0IAZCYWoud2IlUVlWH3wL3x3rsoNiE19DExowJhFQNzBkF2X0ENcYPqcYmAUB/OAGtUdyoAIyoAEFAZmVMAEA4WBUVjk35d6e3vp+mKD0i8C0+cmEvYISCmZzUPo6Gi3ajSaGAZGATBKf8iLMgYmSOXk5BzfuXPneb1+z9Xdu3dfCUZ6vf4qX1c5DyaWB/MiAxOkMjIynuMN+WZSUtIbQWpqYmLiNPJdp9O9wMAwMTAMDBMDw8AEIZ1OMzGSizyj0ekmSt9TlcVodRHOa9qYCBUXWSZ8PjlalcZxHIhU0clpSg5Sqg/K1i099mD6F3Lywkbz8hLHxkziznIq1S0hmNw4dSw3KeZsYl7eWPqMSnVUSSOGEkyo+ue8oea4ejpj1csPjbjGqYxCw6rjcmOFBtXqlk0RVuxWNjLyzAiPEc0y4i1CLxH/Fg8gKkp1hLabq51AQUt4mlwfnJNDVEZcN5kkUkZ0eba6nvRfaNTlau6Qoz76nN2WcjA82Yj+IRWKKxE2IpzRwgYdz4iJjyhrBysHZoTH8IaTA0MGIw/NVae3PojLeKrbU9gSjt1xf5luWYS38Oatf9JrgOiaW+NkfVDFHKWz1R5yRnZOuqynAdLJYfdOMms9eYywLtugbLPfMThvffCljJSc3iaYxOJyDo/yDtizjfwG41wD4mLiCSAyy5UAI55NjnDpaUBCT/O1D76W8SSb8UeGMiF0qf77BUYudMiFMse9qKior8XxWRjD/QllQonb8grGPnuF7Xjqg1wZf8AINyiBhDJfbOTX4u8ePlzXRswAuh3mjL4u/u5t2WairzNNbgGV64NcGV/AyNkpoMXfi43YYY6d/P3b17s8KDSHztFoP5h62OxkHsPEwDyJYJRI2oUivxRsvzztygLJtQWbn3tkZ5TSiclHHoxktthLElE1d26B+LwQHa3O8Zp8FJyVhMlDcoAT7nak8nVSZw5xAlJqXOJ+iXdWwrZowtN+zZlSkjjfjDoYX5OINoO4Tth0oG6nb5ehpDIOtuy1fPJQ6rc4Mest1Hnqlxx0Csl+UCQpGOF7pv8djL9JxEDuzdZqZ3lLHnrLe0klIH3NX/l6L9Dcm+JgAkkiBnrPW/LQV6MI63i8wfiZRPQlBMklT+WSh94SqZ4TkK73MY8NmECTiJ7ASC3+Ugv5JsE7HF8Wf/kEpHcwntp6aMAEIho+PLyuZRpFMML/epF6rcvEUjIMDBMDw8AwMTBMDAwDwxSg/gMy0ghr423fQgAAAABJRU5ErkJggg==">
+    </div>
+
+    <div class="card fi d2 app-role-section" id="core-expert" style="max-width:980px;margin:0 auto 1.5rem">
+      <h4 class="card-h">Expert Reporting</h4>
+      <p class="card-p" style="margin-bottom:1rem">Expert analytics page with the same latest chart image included.</p>
+      <img alt="Expert reporting chart" style="width:100%;height:auto;border-radius:14px;border:1px solid var(--border)" src="data:image/png;base64,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">
+    </div>
+
+    <div class="card fi d2 app-role-section" id="core-denied" style="max-width:980px;margin:0 auto 1.5rem;text-align:center">
+      <h4 class="card-h">Restricted Reporting</h4>
+      <p class="card-p">Detailed reporting pages are available for Manager and Expert roles only.</p>
+    </div>
+
+    <div style="text-align:center;margin-top:2rem" class="fi">
+      <button type="button" id="coreLogoutBtn" class="btn btn-outline-dark">Sign Out</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-wrap">
+    <div class="ft-top">
+      <div>
+        <a href="index.html" class="ft-logo"><img src="assets/img/logo-mark-white.png" alt="AT-IPIC"></a>
+        <div class="ft-tagline">Risk management-based performance transformation and enhancement</div>
+      </div>
+      <div><div class="ft-col-h">Applications</div><ul class="ft-links"><li><a href="core.html">Core</a></li><li><a href="neptune.html">Neptune</a></li><li><a href="christobal.html">Christobal</a></li></ul></div>
+      <div><div class="ft-col-h">Contact</div><a href="mailto:Adrian.Clements@atipicgroup.com" class="ft-contact-item">✉ Adrian.Clements@atipicgroup.com</a><a href="tel:+4917223467050" class="ft-contact-item">📞 +49 172 2346705</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 AT-IPIC Group. All rights reserved.</div></div>
+  </div>
+</footer>
+
+<script src="_nav.js"></script>
+<script>
+(function(){
+  const loginSection = document.getElementById('core-login-section');
+  const contentSection = document.getElementById('core-content-section');
+  const form = document.getElementById('coreLoginForm');
+  const errorEl = document.getElementById('coreLoginError');
+  const logoutBtn = document.getElementById('coreLogoutBtn');
+  const roleButtons = Array.from(document.querySelectorAll('[data-core-role]'));
+  const manager = document.getElementById('core-manager');
+  const expert = document.getElementById('core-expert');
+  const denied = document.getElementById('core-denied');
+
+  function setRole(role){
+    manager.classList.remove('active');
+    expert.classList.remove('active');
+    denied.classList.remove('active');
+    if(role === 'manager') manager.classList.add('active');
+    else if(role === 'expert') expert.classList.add('active');
+    else denied.classList.add('active');
+  }
+
+  roleButtons.forEach((btn)=> btn.addEventListener('click', ()=> setRole(btn.dataset.coreRole)));
+
+  function showContent(){ loginSection.style.display = 'none'; contentSection.style.display = ''; setRole('manager'); }
+  function showLogin(){ contentSection.style.display = 'none'; loginSection.style.display = ''; }
+
+  fetch('/api/christobal/session')
+    .then(r => r.json())
+    .then(data => { if (data.authenticated) showContent(); else showLogin(); })
+    .catch(() => showLogin());
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    const email = document.getElementById('core-email').value.trim();
+    const password = document.getElementById('core-password').value;
+
+    fetch('/api/christobal/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.ok) { form.reset(); showContent(); }
+        else { errorEl.textContent = (data && data.error) || 'Sign in failed. Please try again.'; errorEl.style.display = ''; }
+      })
+      .catch(() => { errorEl.textContent = 'Sign in failed. Please try again.'; errorEl.style.display = ''; });
+  });
+
+  logoutBtn.addEventListener('click', function(){ fetch('/api/christobal/logout', { method: 'POST' }).finally(showLogin); });
+})();
+</script>
+</body>
+</html>

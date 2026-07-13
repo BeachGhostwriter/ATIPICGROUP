@@ -358,6 +358,42 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
 .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
 .hero-btns .btn { font-size: 0.98rem; padding: 0.95rem 2.1rem; }
 .hero-right { min-width: 0; }
+.christobal-demo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  text-decoration: none;
+  margin: -1.25rem 0 2rem;
+  max-width: 430px;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.christobal-demo-link:hover { background: rgba(255,255,255,0.24); transform: translateY(-1px); }
+.cdemo-globe-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8px 18px rgba(11,61,122,0.28);
+}
+.cdemo-globe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: christobalSpin 18s linear infinite;
+}
+.cdemo-copy { display: flex; flex-direction: column; gap: 0.12rem; }
+.cdemo-copy strong { font-size: 0.9rem; line-height: 1.25; color: #fff; }
+.cdemo-copy span { font-size: 0.78rem; line-height: 1.45; color: rgba(255,255,255,0.88); }
+
+@keyframes christobalSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 .hero-stats { display: inline-grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; }
 .hstat { padding: 1.25rem 1.5rem; background: rgba(255,255,255,0.05); text-align: center; }
 .hstat-n { font-family: 'Playfair Display', serif; font-size: 2.3rem; font-weight: 700; color: #fff; display: block; line-height: 1; }
@@ -498,6 +534,22 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
 /* ════════ RESEARCH & DEVELOPMENT ════════ */
 .btn-disabled { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.875rem 2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; background: var(--bg); color: var(--soft); border: 1.5px dashed var(--border); cursor: not-allowed; }
 .rd-badge { display: inline-block; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-500); background: var(--warm-50); border: 1px solid var(--warm-100); border-radius: 50px; padding: 0.25rem 0.8rem; margin-bottom: 0.75rem; }
+
+/* ════════ APP PORTAL HELPERS ════════ */
+.app-role-tabs { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; justify-content: center; }
+.app-role-tab {
+  border: 1px solid var(--blue-300);
+  color: var(--blue-700);
+  background: var(--blue-50);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.app-role-section { display: none; }
+.app-role-section.active { display: block; }
 
 /* ════════ MEDIA PLACEHOLDER FRAMES (for upcoming graphics/photos) ════════ */
 .media-frame {
