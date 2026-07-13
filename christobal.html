@@ -5,6 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Christobal Portal | AT-IPIC Group</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    @keyframes christobalGlobeSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .christobal-globe-shell {
+      width: min(100%, 320px);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      overflow: hidden;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.12), rgba(10,16,24,0.92) 58%, rgba(0,0,0,0.98) 100%);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    .christobal-globe-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow: inset -22px -28px 42px rgba(0,0,0,0.38), inset 16px 14px 32px rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+
+    .christobal-globe-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: christobalGlobeSpin 28s linear infinite;
+      transform-origin: center center;
+      will-change: transform;
+      display: block;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .christobal-globe-image {
+        animation: none;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -123,6 +165,16 @@
       <p class="card-p">Click below to open the Christobal risk &amp; performance assessment platform.</p>
       <div style="margin-top:1.5rem">
         <a href="http://localhost:8765" class="btn btn-solid" id="christobalAppLink" target="_blank">Open Christobal →</a>
+      </div>
+    </div>
+
+    <div class="card fi d2" style="max-width:720px;margin:1.75rem auto 0;text-align:center">
+      <h4 class="card-h">Rotating Earth View</h4>
+      <p class="card-p">This preview now uses an actual Earth image with continents so the globe reads as a real world surface instead of a featureless sphere.</p>
+      <div style="margin-top:1.25rem;display:flex;justify-content:center">
+        <div class="christobal-globe-shell" aria-label="Rotating Earth globe preview">
+          <img src="Brand%20Assets/Media/Graphics/globe-png-31489.jpg" alt="Rotating Earth globe with continents" class="christobal-globe-image">
+        </div>
       </div>
     </div>
 
