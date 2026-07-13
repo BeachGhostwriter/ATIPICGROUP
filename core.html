@@ -148,7 +148,7 @@
   function showContent(){ loginSection.style.display = 'none'; contentSection.style.display = ''; setRole('manager'); }
   function showLogin(){ contentSection.style.display = 'none'; loginSection.style.display = ''; }
 
-  fetch('/api/christobal/session')
+  fetch('/api/core/session')
     .then(r => r.json())
     .then(data => { if (data.authenticated) showContent(); else showLogin(); })
     .catch(() => showLogin());
@@ -159,7 +159,7 @@
     const email = document.getElementById('core-email').value.trim();
     const password = document.getElementById('core-password').value;
 
-    fetch('/api/christobal/login', {
+    fetch('/api/core/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -172,7 +172,7 @@
       .catch(() => { errorEl.textContent = 'Sign in failed. Please try again.'; errorEl.style.display = ''; });
   });
 
-  logoutBtn.addEventListener('click', function(){ fetch('/api/christobal/logout', { method: 'POST' }).finally(showLogin); });
+  logoutBtn.addEventListener('click', function(){ fetch('/api/core/logout', { method: 'POST' }).finally(showLogin); });
 })();
 </script>
 </body>

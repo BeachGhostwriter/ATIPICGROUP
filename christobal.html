@@ -6,44 +6,57 @@
   <title>Christobal Portal | AT-IPIC Group</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    @keyframes christobalGlobeSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
     .christobal-globe-shell {
-      width: min(100%, 320px);
-      aspect-ratio: 1 / 1;
+      width: min(100%, 720px);
       margin: 0 auto;
-      border-radius: 50%;
+      border-radius: 20px;
       overflow: hidden;
-      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.12), rgba(10,16,24,0.92) 58%, rgba(0,0,0,0.98) 100%);
-      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255,255,255,0.08);
-      position: relative;
+      background: radial-gradient(circle at 30% 24%, #1f2f44 0%, #0d1724 48%, #090f18 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+      padding: 0.75rem;
     }
 
-    .christobal-globe-shell::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      box-shadow: inset -22px -28px 42px rgba(0,0,0,0.38), inset 16px 14px 32px rgba(255,255,255,0.07);
-      pointer-events: none;
-    }
-
-    .christobal-globe-image {
+    .christobal-globe-stage {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      animation: christobalGlobeSpin 28s linear infinite;
-      transform-origin: center center;
-      will-change: transform;
-      display: block;
+      height: 460px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 22%, rgba(109, 157, 214, 0.2), rgba(6, 13, 22, 0.9) 64%);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .christobal-globe-image {
-        animation: none;
+    .asset-legend {
+      margin-top: 0.9rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      font-size: 0.74rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .asset-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      padding: 0.28rem 0.55rem;
+    }
+
+    .asset-chip::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #8fe4ff;
+      box-shadow: 0 0 10px rgba(143, 228, 255, 0.9);
+    }
+
+    @media (max-width: 760px) {
+      .christobal-globe-stage {
+        height: 360px;
       }
     }
   </style>
@@ -100,7 +113,7 @@
           <li><a href="research-development.html#blog">Blog &amp; Client References</a></li>
         </ul>
       </li>
-      <li><a href="core.html">Core</a></li>
+      <li><a href="https://adrian-clemnents.com" target="_blank" rel="noopener">Core</a></li>
       <li><a href="neptune.html">Neptune</a></li>
       <li><a href="christobal.html">Christobal</a></li>
       <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
@@ -114,7 +127,7 @@
   <a href="about.html">About Us</a>
   <a href="5-processes.html">5 Processes</a>
   <a href="7-modules.html">7 Modules</a>
-  <a href="core.html">Core</a>
+  <a href="https://adrian-clemnents.com" target="_blank" rel="noopener">Core</a>
   <a href="neptune.html">Neptune</a>
   <a href="research-development.html">Research &amp; Development</a>
   <a href="christobal.html">Christobal</a>
@@ -173,12 +186,13 @@
       </div>
     </div>
 
-    <div class="card fi d2" style="max-width:720px;margin:1.75rem auto 0;text-align:center">
-      <h4 class="card-h">Rotating Earth View</h4>
-      <p class="card-p">This preview now uses an actual Earth image with continents so the globe reads as a real world surface instead of a featureless sphere.</p>
-      <div style="margin-top:1.25rem;display:flex;justify-content:center">
-        <div class="christobal-globe-shell" aria-label="Rotating Earth globe preview">
-          <img src="assets/img/earth-app.jpg" alt="Rotating Earth globe with continents" class="christobal-globe-image">
+    <div class="card fi d2" style="max-width:920px;margin:1.75rem auto 0;text-align:center">
+      <h4 class="card-h">Global Asset Location View</h4>
+      <p class="card-p">Interactive globe rendered with ECharts GL. The Earth texture rotates while client asset locations remain plotted as live markers.</p>
+      <div style="margin-top:1.25rem">
+        <div class="christobal-globe-shell" aria-label="Interactive rotating Earth with client asset markers">
+          <div id="christobalGlobe" class="christobal-globe-stage"></div>
+          <div class="asset-legend" id="assetLegend"></div>
         </div>
       </div>
     </div>
@@ -237,6 +251,8 @@
 </footer>
 
 <script src="_nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-gl@2/dist/echarts-gl.min.js"></script>
 <script>
   (function(){
     const loginSection = document.getElementById('christobal-login-section');
@@ -244,10 +260,98 @@
     const form = document.getElementById('christobalLoginForm');
     const errorEl = document.getElementById('christobalLoginError');
     const logoutBtn = document.getElementById('christobalLogoutBtn');
+    const legend = document.getElementById('assetLegend');
+    let globeChart;
+
+    const assetPoints = [
+      { name: 'Hamburg Asset', value: [9.9937, 53.5511, 5] },
+      { name: 'Johannesburg Asset', value: [28.0473, -26.2041, 5] },
+      { name: 'Monterrey Asset', value: [-100.3161, 25.6866, 5] },
+      { name: 'Sao Paulo Asset', value: [-46.6333, -23.5505, 5] },
+      { name: 'Brisbane Asset', value: [153.0251, -27.4698, 5] },
+      { name: 'Tokyo Asset', value: [139.6917, 35.6895, 5] }
+    ];
+
+    function renderLegend(){
+      legend.innerHTML = '';
+      assetPoints.forEach((point) => {
+        const chip = document.createElement('span');
+        chip.className = 'asset-chip';
+        chip.textContent = point.name;
+        legend.appendChild(chip);
+      });
+    }
+
+    function initGlobe(){
+      const el = document.getElementById('christobalGlobe');
+      if (!el || !window.echarts || globeChart) return;
+
+      globeChart = echarts.init(el);
+      globeChart.setOption({
+        backgroundColor: 'transparent',
+        globe: {
+          baseTexture: 'https://fastly.jsdelivr.net/npm/echarts-gl@2/examples/data-gl/asset/world.topo.bathy.200401.jpg',
+          heightTexture: 'https://fastly.jsdelivr.net/npm/echarts-gl@2/examples/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+          shading: 'realistic',
+          realisticMaterial: {
+            roughness: 0.84,
+            metalness: 0.02,
+            detailTexture: 'https://fastly.jsdelivr.net/npm/echarts-gl@2/examples/data-gl/asset/earth.jpg'
+          },
+          environment: '#081321',
+          displacementScale: 0.02,
+          light: {
+            main: { intensity: 2.0, shadow: false },
+            ambient: { intensity: 0.35 }
+          },
+          viewControl: {
+            autoRotate: true,
+            autoRotateSpeed: 4,
+            alpha: 24,
+            beta: 162,
+            distance: 155,
+            minDistance: 110,
+            maxDistance: 210,
+            targetCoord: [10, 20]
+          }
+        },
+        series: [{
+          type: 'scatter3D',
+          coordinateSystem: 'globe',
+          symbolSize: 10,
+          itemStyle: {
+            color: '#8fe4ff',
+            opacity: 0.95
+          },
+          label: {
+            show: true,
+            formatter: '{b}',
+            position: 'top',
+            distance: 1,
+            color: '#e4f7ff',
+            fontSize: 11,
+            backgroundColor: 'rgba(7,19,33,0.72)',
+            padding: [3, 5],
+            borderRadius: 4
+          },
+          emphasis: {
+            itemStyle: { color: '#ffffff' },
+            label: { color: '#ffffff' }
+          },
+          data: assetPoints
+        }]
+      });
+
+      renderLegend();
+      window.addEventListener('resize', function(){
+        if (globeChart) globeChart.resize();
+      });
+    }
 
     function showContent(){
       loginSection.style.display = 'none';
       contentSection.style.display = '';
+      initGlobe();
     }
     function showLogin(){
       contentSection.style.display = 'none';
