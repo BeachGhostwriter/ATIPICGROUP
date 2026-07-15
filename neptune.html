@@ -77,15 +77,15 @@
       <h4 class="card-h">Launch Neptune Application</h4>
       <p class="card-p">Use the button below to open the active Neptune app endpoint.</p>
       <div style="margin-top:1.5rem">
-        <a href="http://localhost:8502" class="btn btn-solid" target="_blank" rel="noopener">Open Neptune →</a>
+        <a id="neptuneLaunchLink" href="https://yourname-neptune.streamlit.app" class="btn btn-solid" target="_blank" rel="noopener">Open Neptune →</a>
       </div>
-      <p style="font-size:0.78rem;color:var(--mid);margin-top:0.9rem">Update this URL once your hosted Neptune endpoint is available.</p>
+      <p style="font-size:0.78rem;color:var(--mid);margin-top:0.9rem">The Neptune URL is set in the page script constant <strong>NEPTUNE_APP_URL</strong>.</p>
     </div>
 
     <div class="card fi d2" style="max-width:980px;margin:0 auto 1.5rem">
       <h4 class="card-h">Embedded Preview</h4>
-      <p class="card-p" style="margin-bottom:0.9rem">If the local Neptune service is running, the preview loads below.</p>
-      <iframe title="Neptune preview" src="http://localhost:8502" style="width:100%;height:560px;border:1px solid var(--border);border-radius:14px;background:#fff"></iframe>
+      <p class="card-p" style="margin-bottom:0.9rem">The hosted Neptune application preview loads below.</p>
+      <iframe id="neptunePreviewFrame" title="Neptune preview" src="https://yourname-neptune.streamlit.app" style="width:100%;height:560px;border:1px solid var(--border);border-radius:14px;background:#fff"></iframe>
     </div>
 
     <div style="text-align:center;margin-top:2rem" class="fi">
@@ -111,11 +111,17 @@
 <script src="_nav.js"></script>
 <script>
 (function(){
+  const NEPTUNE_APP_URL = 'https://yourname-neptune.streamlit.app';
   const loginSection = document.getElementById('neptune-login-section');
   const contentSection = document.getElementById('neptune-content-section');
   const form = document.getElementById('neptuneLoginForm');
   const errorEl = document.getElementById('neptuneLoginError');
   const logoutBtn = document.getElementById('neptuneLogoutBtn');
+  const launchLink = document.getElementById('neptuneLaunchLink');
+  const previewFrame = document.getElementById('neptunePreviewFrame');
+
+  if (launchLink) launchLink.href = NEPTUNE_APP_URL;
+  if (previewFrame) previewFrame.src = NEPTUNE_APP_URL;
 
   function showContent(){ loginSection.style.display = 'none'; contentSection.style.display = ''; }
   function showLogin(){ contentSection.style.display = 'none'; loginSection.style.display = ''; }
