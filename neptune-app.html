@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neptune — Water Intelligence Dashboard</title>
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --sidebar-bg:   #0A1F30;
+  --sidebar-text: rgba(220,235,245,0.82);
+  --sidebar-act:  #1D7A8C;
+  --sidebar-hov:  rgba(255,255,255,0.07);
+  --bg:           #F1F5F8;
+  --surface:      #FFFFFF;
+  --ink:          #0D1E2D;
+  --ink-2:        #3B566A;
+  --ink-3:        #6A8598;
+  --border:       #CCDAE4;
+  --accent:       #1D7A8C;
+  --accent-lt:    #DDF0F5;
+  --s1:           #C5402E;   /* severe   */
+  --s2:           #D4762A;   /* high     */
+  --s3:           #C9A820;   /* moderate */
+  --s4:           #3A8A5E;   /* low      */
+  --s5:           #1D7A8C;   /* minimal  */
+  --radius:       6px;
+  --sidebar-w:    220px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:       #0B1B27;
+    --surface:  #112030;
+    --ink:      #D8ECF5;
+    --ink-2:    #7AAAC0;
+    --ink-3:    #4A7590;
+    --border:   #1C3548;
+    --accent:   #2A9CB4;
+    --accent-lt:#0F2B3A;
+  }
+}
+:root[data-theme="light"] {
+  --bg:#F1F5F8; --surface:#FFFFFF; --ink:#0D1E2D; --ink-2:#3B566A;
+  --ink-3:#6A8598; --border:#CCDAE4; --accent:#1D7A8C; --accent-lt:#DDF0F5;
+}
+:root[data-theme="dark"] {
+  --bg:#0B1B27; --surface:#112030; --ink:#D8ECF5; --ink-2:#7AAAC0;
+  --ink-3:#4A7590; --border:#1C3548; --accent:#2A9CB4; --accent-lt:#0F2B3A;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-top {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-brand {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.sidebar-title {
+  font-size: 19px;
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.sidebar-nav {
+  padding: 14px 12px;
+  flex: 1;
+}
+.nav-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(220,235,245,0.38);
+  padding: 14px 8px 6px;
+  font-weight: 600;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-item:hover { background: var(--sidebar-hov); }
+.nav-item.active {
+  background: var(--sidebar-act);
+  color: #fff;
+}
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+.sidebar-bottom {
+  padding: 14px 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.05);
+}
+.user-avatar {
+  width: 28px; height: 28px;
+  background: var(--sidebar-act);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-name { font-size: 12px; color: rgba(220,235,245,0.9); }
+.user-role { font-size: 10px; color: rgba(220,235,245,0.45); }
+.sign-out-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  color: rgba(220,235,245,0.5);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.sign-out-btn:hover { background: rgba(197,64,46,0.15); color: #F08070; }
+
+/* ── Main ────────────────────────────────────────────────── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.page-title {
+  font-family: ui-serif, Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+}
+.topbar-meta {
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.topbar-meta a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.topbar-meta a:hover { text-decoration: underline; }
+
+/* ── Content ─────────────────────────────────────────────── */
+.content { padding: 28px 32px 48px; flex: 1; }
+
+/* ── KPI Strip ───────────────────────────────────────────── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.kpi-unit {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-3);
+  margin-left: 2px;
+}
+.kpi-label {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.kpi-stripe {
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+
+/* ── Section header ──────────────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  margin-top: 32px;
+}
+.section-head:first-child { margin-top: 0; }
+.section-title {
+  font-family: ui-serif, Georgia, serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+}
+.section-sub {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ── WEI Bar Chart ───────────────────────────────────────── */
+.wei-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+}
+.wei-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+.wei-country {
+  font-size: 12px;
+  color: var(--ink-2);
+  text-align: right;
+  white-space: nowrap;
+}
+.wei-bar-wrap {
+  background: var(--bg);
+  border-radius: 2px;
+  height: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.wei-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.wei-threshold {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--ink-3);
+  opacity: 0.4;
+}
+.wei-val {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  font-family: ui-monospace, 'Consolas', monospace;
+  text-align: right;
+}
+.wei-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Two-col layout ──────────────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+/* ── Country Table ───────────────────────────────────────── */
+.data-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.data-table th {
+  background: var(--bg);
+  color: var(--ink-3);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg); }
+.td-num {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, 'Consolas', monospace;
+  font-size: 12px;
+  text-align: right;
+}
+.stress-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Sector Panel ────────────────────────────────────────── */
+.sector-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+}
+.sector-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+canvas { display: block; }
+.sector-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.sector-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.sector-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.sector-pct {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, 'Consolas', monospace;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ── Source footer ───────────────────────────────────────── */
+.source-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.source-label {
+  font-size: 10px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.source-link {
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.source-link:hover { text-decoration: underline; }
+
+/* ── Auth overlay ────────────────────────────────────────── */
+.auth-overlay {
+  position: fixed; inset: 0;
+  background: var(--sidebar-bg);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sidebar-text);
+  font-size: 14px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-220px); }
+  .main { margin-left: 0; }
+  .kpi-strip { grid-template-columns: 1fr 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-strip { grid-template-columns: 1fr; }
+  .content { padding: 18px 16px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-overlay" id="authOverlay">Verifying session…</div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand">AT-IPIC Group</div>
+    <div class="sidebar-title">Neptune</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Intelligence</div>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+        <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="6"/><path d="M2.5 8h11M8 2.5C6.5 5 6.5 11 8 13.5M8 2.5C9.5 5 9.5 11 8 13.5"/>
+      </svg>
+      Water Stress Map
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 12 L5 7 L8 9 L11 4 L14 6"/><circle cx="14" cy="6" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+      Trend Analysis
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1v4M8 11v4M1 8h4M11 8h4"/><circle cx="8" cy="8" r="3"/>
+      </svg>
+      Treatment Planner
+    </a>
+    <div class="nav-label">Reports</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="1" width="10" height="14" rx="1"/><path d="M6 5h4M6 8h4M6 11h2"/>
+      </svg>
+      Country Profiles
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 14V6l4-4h8v12H2z"/><path d="M6 2v4H2"/>
+      </svg>
+      EEA Data Export
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div>
+        <div class="user-name" id="userEmail">—</div>
+        <div class="user-role">Neptune User</div>
+      </div>
+    </div>
+    <button class="sign-out-btn" onclick="signOut()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 5l3 3-3 3M7 8h7"/><path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h4"/>
+      </svg>
+      Sign out
+    </button>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <h1 class="page-title">European Water Stress — Overview</h1>
+    <span class="topbar-meta">
+      Source: <a href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA Indicator IND-111</a>
+      &nbsp;·&nbsp; Water Exploitation Index Plus (WEI+) &nbsp;·&nbsp; Latest available data
+    </span>
+  </div>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-stripe" style="background:var(--s1)"></div>
+        <div class="kpi-value">8<span class="kpi-unit"> countries</span></div>
+        <div class="kpi-label">Above 20% water scarcity threshold</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-stripe" style="background:var(--s3)"></div>
+        <div class="kpi-value">11<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">EU population in water-scarce areas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-stripe" style="background:var(--s4)"></div>
+        <div class="kpi-value">−18<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">Freshwater abstractions since 2000</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-stripe" style="background:var(--accent)"></div>
+        <div class="kpi-value">12<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">EU average WEI+ (renewable resources used)</div>
+      </div>
+    </div>
+
+    <!-- WEI Chart -->
+    <div class="section-head">
+      <h2 class="section-title">Water Exploitation Index Plus by Country</h2>
+      <span class="section-sub">WEI+ = annual abstractions ÷ long-term renewable freshwater. Threshold: 20%</span>
+    </div>
+    <div class="wei-chart">
+      <div id="weiChart"></div>
+      <div class="wei-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s1)"></div>Severe (&gt;40%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s2)"></div>High (20–40%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s3)"></div>Moderate (15–20%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s4)"></div>Low (5–15%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s5)"></div>Minimal (&lt;5%)</div>
+        <div class="legend-item" style="margin-left:auto">
+          <div style="width:1px;height:12px;background:var(--ink-3);opacity:0.5"></div>
+          20% scarcity threshold
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Table + Sectors -->
+    <div class="section-head">
+      <h2 class="section-title">Country Detail</h2>
+      <span class="section-sub">Sorted by WEI+ descending · Mediterranean basin disproportionately affected</span>
+    </div>
+
+    <div class="two-col">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th style="text-align:right">WEI+</th>
+              <th>Stress Level</th>
+              <th>Primary Pressure</th>
+            </tr>
+          </thead>
+          <tbody id="countryTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="sector-panel">
+        <div class="sector-title">Water Use by Sector — Europe</div>
+        <canvas id="sectorCanvas" width="264" height="180"></canvas>
+        <div class="sector-list" id="sectorList"></div>
+        <p style="font-size:10px;color:var(--ink-3);margin-top:14px;line-height:1.5">
+          Energy dominates water use through cooling in thermal power plants.
+          Agriculture drives stress in southern regions.
+          Source: EEA Waterbase / Eurostat.
+        </p>
+      </div>
+    </div>
+
+    <!-- Source -->
+    <div class="source-footer">
+      <span class="source-label">Data Sources</span>
+      <a class="source-link" href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA — Use of Freshwater Resources in Europe (IND-111)</a>
+      <a class="source-link" href="https://water.europa.eu/freshwater" target="_blank" rel="noopener">EEA Water Information System for Europe (WISE)</a>
+      <a class="source-link" href="https://www.eea.europa.eu/publications/water-resources-across-europe" target="_blank" rel="noopener">EEA Water Resources Report</a>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+/* ── Data ───────────────────────────────────────────────── */
+const WEI_DATA = [
+  { country: 'Cyprus',         wei: 42.7, level: 'Severe'   , pressure: 'Tourism, irrigation'     },
+  { country: 'Malta',          wei: 35.2, level: 'Severe'   , pressure: 'Groundwater depletion'   },
+  { country: 'Spain',          wei: 32.1, level: 'High'     , pressure: 'Irrigated agriculture'   },
+  { country: 'Belgium',        wei: 29.6, level: 'High'     , pressure: 'Industrial demand'        },
+  { country: 'Italy',          wei: 25.3, level: 'High'     , pressure: 'Agriculture, energy'      },
+  { country: 'Bulgaria',       wei: 22.1, level: 'High'     , pressure: 'Energy cooling'           },
+  { country: 'France',         wei: 21.7, level: 'High'     , pressure: 'Nuclear cooling'          },
+  { country: 'Germany',        wei: 20.4, level: 'High'     , pressure: 'Industry, energy'         },
+  { country: 'Poland',         wei: 19.8, level: 'Moderate' , pressure: 'Coal energy cooling'      },
+  { country: 'Romania',        wei: 19.3, level: 'Moderate' , pressure: 'Irrigation, energy'       },
+  { country: 'Greece',         wei: 18.1, level: 'Moderate' , pressure: 'Tourism, agriculture'     },
+  { country: 'Portugal',       wei: 16.9, level: 'Moderate' , pressure: 'Irrigated agriculture'    },
+  { country: 'Czech Republic', wei: 14.7, level: 'Low'      , pressure: 'Industry'                 },
+  { country: 'Hungary',        wei: 13.8, level: 'Low'      , pressure: 'Agriculture'               },
+  { country: 'Netherlands',    wei: 10.1, level: 'Low'      , pressure: 'Industry, horticulture'   },
+  { country: 'Austria',        wei:  8.4, level: 'Low'      , pressure: 'Energy cooling'           },
+  { country: 'Ireland',        wei:  4.2, level: 'Minimal'  , pressure: 'Public supply'            },
+  { country: 'Sweden',         wei:  3.7, level: 'Minimal'  , pressure: 'Energy sector'            },
+  { country: 'Finland',        wei:  2.1, level: 'Minimal'  , pressure: 'Pulp & paper industry'    },
+  { country: 'Norway',         wei:  1.8, level: 'Minimal'  , pressure: 'Hydropower losses'        },
+];
+
+const SECTORS = [
+  { label: 'Energy',          pct: 44, color: '#1D7A8C' },
+  { label: 'Agriculture',     pct: 33, color: '#3A8A5E' },
+  { label: 'Public Supply',   pct: 15, color: '#C9A820' },
+  { label: 'Industry',        pct:  8, color: '#D4762A' },
+];
+
+const LEVEL_COLOR = {
+  Severe:   '#C5402E',
+  High:     '#D4762A',
+  Moderate: '#C9A820',
+  Low:      '#3A8A5E',
+  Minimal:  '#1D7A8C',
+};
+const LEVEL_BG = {
+  Severe:   'rgba(197,64,46,0.12)',
+  High:     'rgba(212,118,42,0.12)',
+  Moderate: 'rgba(201,168,32,0.12)',
+  Low:      'rgba(58,138,94,0.12)',
+  Minimal:  'rgba(29,122,140,0.12)',
+};
+
+/* ── Build WEI chart ────────────────────────────────────── */
+function buildWeiChart() {
+  const wrap = document.getElementById('weiChart');
+  const maxWei = 50;
+  const thresholdPct = (20 / maxWei) * 100;
+  WEI_DATA.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'wei-row';
+    const barPct = (d.wei / maxWei) * 100;
+    const col = LEVEL_COLOR[d.level];
+    row.innerHTML = `
+      <span class="wei-country">${d.country}</span>
+      <div class="wei-bar-wrap">
+        <div class="wei-threshold" style="left:${thresholdPct}%"></div>
+        <div class="wei-bar" style="width:${barPct}%;background:${col}"></div>
+      </div>
+      <span class="wei-val">${d.wei.toFixed(1)}%</span>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+/* ── Build country table ────────────────────────────────── */
+function buildTable() {
+  const tbody = document.getElementById('countryTableBody');
+  WEI_DATA.forEach(d => {
+    const tr = document.createElement('tr');
+    const col = LEVEL_COLOR[d.level];
+    const bg  = LEVEL_BG[d.level];
+    tr.innerHTML = `
+      <td>${d.country}</td>
+      <td class="td-num">${d.wei.toFixed(1)}%</td>
+      <td><span class="stress-chip" style="color:${col};background:${bg}">${d.level}</span></td>
+      <td style="color:var(--ink-2);font-size:11.5px">${d.pressure}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── Sector donut ───────────────────────────────────────── */
+function drawDonut() {
+  const canvas = document.getElementById('sectorCanvas');
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const r = 70, hole = 44;
+  let start = -Math.PI / 2;
+  SECTORS.forEach(s => {
+    const angle = (s.pct / 100) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, start + angle);
+    ctx.closePath();
+    ctx.fillStyle = s.color;
+    ctx.fill();
+    start += angle;
+  });
+  // hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, hole, 0, 2 * Math.PI);
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff';
+  ctx.fillStyle = bg;
+  ctx.fill();
+  // center label
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0D1E2D';
+  ctx.font = 'bold 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('EU', cx, cy - 8);
+  ctx.font = '10px system-ui';
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink-3').trim() || '#6A8598';
+  ctx.fillText('by sector', cx, cy + 10);
+
+  const list = document.getElementById('sectorList');
+  SECTORS.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'sector-row';
+    row.innerHTML = `
+      <div class="sector-dot" style="background:${s.color}"></div>
+      <span>${s.label}</span>
+      <span class="sector-pct">${s.pct}%</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+/* ── Session check ──────────────────────────────────────── */
+function signOut() {
+  fetch('/api/neptune/logout', { method: 'POST' })
+    .finally(() => { window.location.href = '/'; });
+}
+
+async function checkSession() {
+  try {
+    const r = await fetch('/api/neptune/session');
+    const data = await r.json();
+    if (!data.authenticated) {
+      window.location.href = '/';
+      return;
+    }
+    // Show user info
+    if (data.email) {
+      const short = data.email.split('@')[0];
+      document.getElementById('userEmail').textContent = data.email;
+      document.getElementById('userAvatar').textContent = short[0].toUpperCase();
+    }
+    document.getElementById('authOverlay').style.display = 'none';
+  } catch {
+    window.location.href = '/';
+  }
+}
+
+/* ── Init ───────────────────────────────────────────────── */
+checkSession();
+buildWeiChart();
+buildTable();
+drawDonut();
+</script>
+</body>
+</html>
