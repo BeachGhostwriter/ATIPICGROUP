@@ -11,7 +11,7 @@
       "dest": "/api/$1"
     },
     {
-      "src": "^/(.*)",
+      "src": "^/$",
       "has": [{ "type": "host", "value": "neptune.atipicgroup.com" }],
       "dest": "/neptune.html"
     }
