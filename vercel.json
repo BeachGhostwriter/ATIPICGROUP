@@ -1,17 +1,17 @@
 {
   "routes": [
     {
-      "src": "/app",
+      "src": "^/app$",
       "has": [{ "type": "host", "value": "neptune.atipicgroup.com" }],
       "dest": "/neptune-app.html"
     },
     {
-      "src": "/api/(.*)",
+      "src": "^/api/(.*)",
       "has": [{ "type": "host", "value": "neptune.atipicgroup.com" }],
       "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(.*)",
       "has": [{ "type": "host", "value": "neptune.atipicgroup.com" }],
       "dest": "/neptune.html"
     }
