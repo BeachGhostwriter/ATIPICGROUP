@@ -105,18 +105,13 @@
 <script>
 (function(){
   const loginSection = document.getElementById('neptune-login-section');
-  const contentSection = document.getElementById('neptune-content-section');
   const form = document.getElementById('neptuneLoginForm');
   const errorEl = document.getElementById('neptuneLoginError');
-  const logoutBtn = document.getElementById('neptuneLogoutBtn');
-
-  function showContent(){ loginSection.style.display = 'none'; contentSection.style.display = ''; }
-  function showLogin(){ contentSection.style.display = 'none'; loginSection.style.display = ''; }
 
   fetch('/api/neptune/session')
     .then(r => r.json())
-    .then(data => { if (data.authenticated) showContent(); else showLogin(); })
-    .catch(() => showLogin());
+    .then(data => { if (data.authenticated) window.location.href = '/app'; })
+    .catch(() => {});
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -131,13 +126,11 @@
     })
       .then(r => r.json().then(data => ({ ok: r.ok, data })))
       .then(({ ok, data }) => {
-        if (ok && data.ok) { form.reset(); showContent(); }
+        if (ok && data.ok) { window.location.href = '/app'; }
         else { errorEl.textContent = (data && data.error) || 'Sign in failed. Please try again.'; errorEl.style.display = ''; }
       })
       .catch(() => { errorEl.textContent = 'Sign in failed. Please try again.'; errorEl.style.display = ''; });
   });
-
-  logoutBtn.addEventListener('click', function(){ fetch('/api/neptune/logout', { method: 'POST' }).finally(showLogin); });
 })();
 </script>
 </body>
