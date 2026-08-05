@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neptune Portal | AT-IPIC Group</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav id="sitenav">
+  <div class="nav-wrap">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/img/logo-mark-white.png" alt="AT-IPIC" class="logo-default">
+      <img src="assets/img/logo-mark-blue.png" alt="AT-IPIC" class="logo-onlight">
+    </a>
+    <ul class="nav-menu">
+      <li><a href="https://www.atipicgroup.com" target="_blank" rel="noopener">Home</a></li>
+      <li><a href="https://www.atipicgroup.com/about.html" target="_blank" rel="noopener">About Us</a></li>
+      <li><a href="https://www.atipicgroup.com/research-development.html" target="_blank" rel="noopener">Research &amp; Development</a></li>
+      <li><a href="https://core.adrian-clements.com" target="_blank" rel="noopener">Core</a></li>
+      <li><a href="https://neptune.atipicgroup.com">Neptune</a></li>
+      <li><a href="https://christobal.atipicgroup.com" target="_blank" rel="noopener">Christobal</a></li>
+      <li><a href="https://www.atipicgroup.com/contact.html" target="_blank" rel="noopener" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="drawer">
+  <button class="mobile-close" id="drawerClose">✕</button>
+  <a href="https://www.atipicgroup.com" target="_blank" rel="noopener">Home</a>
+  <a href="https://www.atipicgroup.com/about.html" target="_blank" rel="noopener">About Us</a>
+  <a href="https://www.atipicgroup.com/research-development.html" target="_blank" rel="noopener">Research &amp; Development</a>
+  <a href="https://core.adrian-clements.com" target="_blank" rel="noopener">Core</a>
+  <a href="https://neptune.atipicgroup.com">Neptune</a>
+  <a href="https://christobal.atipicgroup.com" target="_blank" rel="noopener">Christobal</a>
+  <a href="https://www.atipicgroup.com/contact.html" target="_blank" rel="noopener" style="margin-top:1.5rem;background:var(--blue-300);color:var(--blue-800);border-radius:50px;text-align:center;font-weight:600;padding:0.75rem 1rem;">Contact Us</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb"><a href="https://www.atipicgroup.com" target="_blank" rel="noopener">Home</a><span class="breadcrumb-sep">›</span><span>Neptune</span></div>
+    <h1>Neptune Portal</h1>
+    <p>Secure access to the Neptune water intelligence application.</p>
+  </div>
+</div>
+
+<section class="section section-white" id="neptune-login-section">
+  <div class="wrap" style="max-width:480px">
+    <div class="ct-form-box fi">
+      <h3 class="ct-form-title">Sign In</h3>
+      <form id="neptuneLoginForm">
+        <div class="f-group">
+          <label for="neptune-email">Email Address</label>
+          <input type="email" id="neptune-email" name="email" placeholder="your@email.com" autocomplete="username">
+        </div>
+        <div class="f-group">
+          <label for="neptune-password">Password</label>
+          <input type="password" id="neptune-password" name="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <p id="neptuneLoginError" style="display:none;color:#c0392b;font-size:0.85rem;margin-bottom:1rem"></p>
+        <button type="submit" class="btn-submit">Sign In →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section section-white" id="neptune-content-section" style="display:none">
+  <div class="wrap">
+    <div class="text-center mb-4">
+      <span class="s-tag fi">Neptune</span>
+      <h2 class="s-h fi d1">Neptune Water Intelligence</h2>
+      <p class="s-p max-580 mx-auto fi d2">Neptune is the water analysis and treatment decision platform. Naming has been standardised to Neptune across this portal.</p>
+    </div>
+
+    <div class="card fi d1" style="max-width:880px;margin:0 auto 1.5rem;text-align:center">
+      <h4 class="card-h">Launch Neptune Application</h4>
+      <p class="card-p">Use the button below to open the active Neptune app endpoint.</p>
+      <div style="margin-top:1.5rem">
+        <a id="neptuneLaunchLink" href="https://neptune.atipicgroup.com" class="btn btn-solid" target="_blank" rel="noopener">Open Neptune →</a>
+      </div>
+      <p style="font-size:0.78rem;color:var(--mid);margin-top:0.9rem">Canonical production URL: <strong>https://neptune.atipicgroup.com</strong>.</p>
+    </div>
+
+    <div style="text-align:center;margin-top:2rem" class="fi">
+      <button type="button" id="neptuneLogoutBtn" class="btn btn-outline-dark">Sign Out</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-wrap">
+    <div class="ft-top">
+      <div>
+        <a href="index.html" class="ft-logo"><img src="assets/img/logo-mark-white.png" alt="AT-IPIC"></a>
+        <div class="ft-tagline">Risk management-based performance transformation and enhancement</div>
+      </div>
+      <div><div class="ft-col-h">Applications</div><ul class="ft-links"><li><a href="https://core.adrian-clements.com" target="_blank" rel="noopener">Core</a></li><li><a href="https://neptune.atipicgroup.com">Neptune</a></li><li><a href="https://christobal.atipicgroup.com" target="_blank" rel="noopener">Christobal</a></li></ul></div>
+      <div><div class="ft-col-h">Contact</div><a href="mailto:Adrian.Clements@atipicgroup.com" class="ft-contact-item">✉ Adrian.Clements@atipicgroup.com</a><a href="tel:+4917223467050" class="ft-contact-item">📞 +49 172 2346705</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 AT-IPIC Group. All rights reserved.</div></div>
+  </div>
+</footer>
+
+<script src="_nav.js"></script>
+<script>
+(function(){
+  const NEPTUNE_APP_URL = 'https://neptune.atipicgroup.com';
+  const loginSection = document.getElementById('neptune-login-section');
+  const contentSection = document.getElementById('neptune-content-section');
+  const form = document.getElementById('neptuneLoginForm');
+  const errorEl = document.getElementById('neptuneLoginError');
+  const logoutBtn = document.getElementById('neptuneLogoutBtn');
+  const launchLink = document.getElementById('neptuneLaunchLink');
+
+  if (launchLink) launchLink.href = NEPTUNE_APP_URL;
+
+  function showContent(){ loginSection.style.display = 'none'; contentSection.style.display = ''; }
+  function showLogin(){ contentSection.style.display = 'none'; loginSection.style.display = ''; }
+
+  fetch('/api/session')
+    .then(r => r.json())
+    .then(data => { if (data.authenticated) showContent(); else showLogin(); })
+    .catch(() => showLogin());
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    const email = document.getElementById('neptune-email').value.trim();
+    const password = document.getElementById('neptune-password').value;
+
+    if (!email || !password) {
+      errorEl.textContent = 'Enter your email and password.';
+      errorEl.style.display = '';
+      return;
+    }
+
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.ok) { form.reset(); showContent(); }
+        else { errorEl.textContent = (data && data.error) || 'Sign in failed. Please try again.'; errorEl.style.display = ''; }
+      })
+      .catch(() => { errorEl.textContent = 'Sign in failed. Please try again.'; errorEl.style.display = ''; });
+  });
+
+  logoutBtn.addEventListener('click', function(){ fetch('/api/logout', { method: 'POST' }).finally(showLogin); });
+})();
+</script>
+</body>
+</html>

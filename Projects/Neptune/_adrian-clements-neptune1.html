@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neptune1 — AMC Water Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bcg-green': '#00A651',
+            'bcg-green-dark': '#006338',
+            'bcg-black': '#1A1A1A',
+            'bcg-grey': '#F4F4F4',
+            'bcg-mid': '#555555',
+          },
+          fontFamily: {
+            sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 10px; scroll-behavior: smooth; }
+    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 1.4rem; line-height: 1.6; color: #1A1A1A; background: #fff; overflow-x: hidden; }
+    .display-xl  { font-size: clamp(2.8rem, 4.5vw, 5.2rem); font-weight: 300; line-height: 1.08; letter-spacing: -0.02em; }
+    .display-lg  { font-size: clamp(2.2rem, 3vw, 3.6rem);   font-weight: 300; line-height: 1.1;  letter-spacing: -0.015em; }
+    .display-md  { font-size: clamp(1.8rem, 2.2vw, 2.6rem); font-weight: 400; line-height: 1.2; }
+    .body-lg     { font-size: 1.6rem; line-height: 1.65; }
+    .label       { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+    .nav-link { font-size: 1.3rem; font-weight: 500; color: #1A1A1A; text-decoration: none; padding: 0.4rem 0; position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #00A651; transition: width 0.22s cubic-bezier(.4,0,.2,1); }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link:hover { color: #006338; }
+    .btn-green { display: inline-flex; align-items: center; gap: 0.6rem; background: #00A651; color: #fff; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 1rem 2.2rem; border: none; cursor: pointer; transition: background 0.18s ease, transform 0.14s ease; text-decoration: none; }
+    .btn-green:hover { background: #006338; transform: translateY(-1px); }
+    .btn-outline-green { display: inline-flex; align-items: center; gap: 0.6rem; background: transparent; color: #00A651; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 1rem 2.2rem; border: 2px solid #00A651; cursor: pointer; transition: background 0.18s ease, color 0.18s ease, transform 0.14s ease; text-decoration: none; }
+    .btn-outline-green:hover { background: #00A651; color: #fff; transform: translateY(-1px); }
+    .section-rule { width: 4rem; height: 3px; background: #00A651; margin-bottom: 1.6rem; }
+    .hero-wave { position: absolute; inset: 0; overflow: hidden; }
+    .hero-wave svg { position: absolute; left: 0; width: 100%; height: 100%; }
+    .hero-wave .shape-1 { opacity: 0.14; }
+    .hero-wave .shape-2 { opacity: 0.22; }
+    .hero-wave .shape-3 { opacity: 0.32; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.6rem; }
+    .feature-card { background: rgba(255,255,255,0.9); border: 1px solid #e2f1e7; border-radius: 1.2rem; padding: 2.4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
+    .feature-card h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .feature-card p { color: #555; line-height: 1.75; }
+  </style>
+</head>
+<body>
+<header id="site-header" style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;transition:box-shadow 0.2s ease;">
+  <nav style="max-width:1280px;margin:0 auto;padding:1.8rem 2.4rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;">
+    <a href="index.html" aria-label="AMC Home"><img src="brand_assets/AMC logo.png" alt="AMC — Adrian Clements" style="height:7.2rem;width:auto;" /></a>
+    <div style="display:flex;align-items:center;gap:2.4rem;flex-wrap:wrap;">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="https://core.adrian-clements.com" class="nav-link">CORE App</a>
+      <a href="neptune1.html" class="nav-link">Neptune1</a>
+      <a href="about.html" class="nav-link">About</a>
+    </div>
+  </nav>
+</header>
+<section style="position:relative;overflow:hidden;background:#f4f9f6;min-height:70vh;display:flex;align-items:center;">
+  <div class="hero-wave" aria-hidden="true">
+    <svg class="shape-1" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,96 C360,192 1080,0 1440,96 L1440,320 L0,320 Z" fill="#00A651"></path></svg>
+    <svg class="shape-2" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,192 C360,144 1080,272 1440,208 L1440,320 L0,320 Z" fill="#006338"></path></svg>
+    <svg class="shape-3" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,256 C360,176 1080,320 1440,240 L1440,320 L0,320 Z" fill="#00A651"></path></svg>
+  </div>
+  <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:7rem 2.4rem;display:grid;grid-template-columns:1fr 0.95fr;gap:4rem;align-items:center;">
+    <div>
+      <p class="label" style="color:#006338;margin-bottom:1rem;">Water Intelligence Platform</p>
+      <h1 class="display-xl" style="color:#1A1A1A;max-width:56rem;margin-bottom:2rem;">Neptune1 — The Intelligent Water Management Experience</h1>
+      <p class="body-lg" style="color:#333;max-width:46rem;margin-bottom:3rem;">
+        A simplified landing page for the Neptune water intelligence platform. Built for industrial water managers looking to understand the application and access the Streamlit demonstration.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:1.2rem;">
+        <a href="Neptune1/README.md" class="btn-green">Open Neptune1 Docs</a>
+        <a href="Neptune1/launch_neptune.bat" class="btn-outline-green">Launch Locally</a>
+      </div>
+    </div>
+    <div style="display:grid;gap:1.6rem;">
+      <div class="feature-card">
+        <h3>Duplicated Dupont layout</h3>
+        <p>The page now uses a clean wave hero and simplified app summary with the Neptune1 text and positioning requested.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Streamlit application</h3>
+        <p>The actual Neptune1 app runs from the `Neptune1/Home.py` Streamlit project, which is accessible locally and intended to be launched from the README or batch script.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section style="padding:6rem 2.4rem;background:#fff;">
+  <div style="max-width:1280px;margin:0 auto;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:3rem;margin-bottom:4rem;">
+      <div style="max-width:56rem;">
+        <div class="section-rule"></div>
+        <h2 class="display-lg" style="color:#1A1A1A;">Neptune1 at a glance</h2>
+      </div>
+      <p class="body-lg" style="color:#555;max-width:44rem;">Neptune1 is a practical water treatment and cost optimisation platform designed for industrial settings. It combines water balance analysis, treatment selection, cost modelling and value creation metrics.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Country & Region analysis</h3>
+        <p>Water stress maps, discharge limits, and regional contexts pulled together with the operational decision model.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Company data & flow diagrams</h3>
+        <p>Plant-level water flows, contaminant tracking and Sankey-style analysis for industrial users.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Treatment & cost estimation</h3>
+        <p>Technology selection, CAPEX/OPEX calculation, and economic value insights for recycle and reuse strategies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<footer style="background:#1A1A1A;color:#fff;padding:4rem 2.4rem;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:2rem;">
+    <p style="font-size:1.3rem;line-height:1.8;max-width:56rem;">Neptune1 is part of AMC's applied platform suite. Use the `launch_neptune.bat` script in the Neptune1 folder or run `streamlit run Home.py` to explore the full interactive application.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;">
+      <a href="index.html" class="btn-outline-green">Back to AMC Home</a>
+      <a href="Neptune1/README.md" class="btn-green">Neptune1 Documentation</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
