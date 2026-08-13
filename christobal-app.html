@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christobal — Risk &amp; Performance Platform</title>
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg:       #0c141e;
+  --panel:    #111b28;
+  --panel-2:  #162233;
+  --sidebar:  #080f17;
+  --accent:   #3b9eff;
+  --accent-2: #1a7fe0;
+  --green:    #28c87a;
+  --amber:    #f5a623;
+  --red:      #e84545;
+  --text:     #d8e8f4;
+  --text-dim: #7a9ab4;
+  --border:   rgba(255,255,255,0.07);
+  --sidebar-w: 222px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 13.5px;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sidebar-brand {
+  padding: 26px 22px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+.brand-sub {
+  font-size: 10px;
+  color: rgba(120,160,200,0.5);
+  margin-top: 2px;
+}
+.sidebar-nav {
+  padding: 14px 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+.nav-section {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(120,160,200,0.35);
+  padding: 10px 8px 4px;
+  font-weight: 700;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: rgba(59,158,255,0.07); color: var(--text); }
+.nav-item.active { background: rgba(59,158,255,0.14); color: var(--accent); }
+.nav-item svg { opacity: 0.6; flex-shrink: 0; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-bottom {
+  padding: 14px 10px;
+  border-top: 1px solid var(--border);
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 6px;
+}
+.user-avatar {
+  width: 28px; height: 28px;
+  background: var(--accent-2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-email { font-size: 10.5px; color: var(--text-dim); word-break: break-all; }
+.user-role  { font-size: 8.5px; color: rgba(120,160,200,0.4); }
+.sign-out {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: none;
+  color: rgba(120,160,200,0.4);
+  font-size: 11.5px;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.sign-out:hover { background: rgba(232,69,69,0.12); color: #f08080; }
+
+/* ── Main ────────────────────────────────────────────────── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+.page-date  { font-size: 11px; color: var(--text-dim); }
+.content { padding: 24px 28px 60px; }
+
+/* ── Tab bar ─────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+.tab {
+  padding: 8px 16px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Stats strip ─────────────────────────────────────────── */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-top: 4px;
+}
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-top: 6px;
+}
+.badge-green { background: rgba(40,200,122,0.15); color: var(--green); }
+.badge-amber { background: rgba(245,166,35,0.15); color: var(--amber); }
+.badge-red   { background: rgba(232,69,69,0.15);  color: var(--red);   }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.card-full { margin-bottom: 14px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+/* ── Risk chart (bar-based) ──────────────────────────────── */
+.risk-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.risk-label { width: 96px; flex-shrink: 0; color: var(--text-dim); }
+.risk-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.risk-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.risk-val { width: 36px; text-align: right; font-size: 11px; color: var(--text-dim); }
+.risk-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Asset table ─────────────────────────────────────────── */
+.asset-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.asset-table th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+.asset-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--text);
+}
+.asset-table tr:last-child td { border-bottom: none; }
+.asset-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Score ring ──────────────────────────────────────────── */
+.score-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ring-wrap { position: relative; width: 100px; height: 100px; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ring-val { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+.ring-sub { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+.ring-label { font-size: 11px; color: var(--text-dim); text-align: center; }
+
+/* ── Status pills ────────────────────────────────────────── */
+.pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.pill-green  { background: rgba(40,200,122,0.15); color: #28c87a; }
+.pill-amber  { background: rgba(245,166,35,0.15);  color: #f5a623; }
+.pill-red    { background: rgba(232,69,69,0.15);   color: #e84545; }
+.pill-blue   { background: rgba(59,158,255,0.15);  color: #3b9eff; }
+
+/* ── Radar chart (CSS-based) ─────────────────────────────── */
+.radar-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+/* ── Network placeholder ─────────────────────────────────── */
+.network-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  color: var(--text-dim);
+  font-size: 12px;
+  gap: 8px;
+}
+.network-placeholder svg { opacity: 0.3; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 960px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { display: none; }
+  .stats-strip { grid-template-columns: 1fr 1fr; }
+  .card-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .stats-strip { grid-template-columns: 1fr; }
+  .content { padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-eyebrow">AT-IPIC Group</div>
+    <div class="brand-name">Christobal</div>
+    <div class="brand-sub">Risk &amp; Performance Platform</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Platform</div>
+    <button class="nav-item active" onclick="switchTab('overview')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+        <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+      </svg>
+      Overview
+    </button>
+    <button class="nav-item" onclick="switchTab('isorisk')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 12 L5 7 L8 9 L11 4 L14 6"/>
+        <circle cx="14" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+      </svg>
+      IsoRisk Analysis
+    </button>
+    <button class="nav-item" onclick="switchTab('vulnerability')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1 L14 5 V10 C14 13 8 15 8 15 C8 15 2 13 2 10 V5 Z"/>
+        <path d="M5.5 8 L7 9.5 L10.5 6"/>
+      </svg>
+      Vulnerability Map
+    </button>
+    <button class="nav-item" onclick="switchTab('network')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="2"/><circle cx="2.5" cy="3.5" r="1.5"/><circle cx="13.5" cy="3.5" r="1.5"/>
+        <circle cx="2.5" cy="12.5" r="1.5"/><circle cx="13.5" cy="12.5" r="1.5"/>
+        <line x1="4" y1="4.5" x2="6.5" y2="7"/><line x1="12" y1="4.5" x2="9.5" y2="7"/>
+        <line x1="4" y1="11.5" x2="6.5" y2="9"/><line x1="12" y1="11.5" x2="9.5" y2="9"/>
+      </svg>
+      Rec. Network
+    </button>
+    <div class="nav-section">Assets</div>
+    <button class="nav-item" onclick="switchTab('portfolio')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="6"/><path d="M2.5 8h11M8 2.5C6.5 5 6.5 11 8 13.5M8 2.5C9.5 5 9.5 11 8 13.5"/>
+      </svg>
+      Asset Portfolio
+    </button>
+    <div class="nav-section">Reports</div>
+    <button class="nav-item" onclick="switchTab('reports')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="1" width="10" height="14" rx="1"/><path d="M6 5h4M6 8h4M6 11h2"/>
+      </svg>
+      Reports
+    </button>
+    <div class="nav-section">External</div>
+    <a class="nav-item" href="https://atipicgroup.com" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 9v4a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h4M10 2h4v4M8.5 7.5L14 2"/>
+      </svg>
+      AT-IPIC Group
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div>
+        <div class="user-email" id="userEmail">—</div>
+        <div class="user-role">Administrator</div>
+      </div>
+    </div>
+    <button class="sign-out" id="signOutBtn">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 5l3 3-3 3M7 8h7"/><path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h4"/>
+      </svg>
+      Sign out
+    </button>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <h1 class="page-title" id="pageTitle">Overview</h1>
+    <span class="page-date" id="pageDate"></span>
+  </div>
+
+  <div class="content">
+
+    <!-- Overview tab -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('isorisk')">IsoRisk</button>
+        <button class="tab" onclick="switchTab('vulnerability')">Vulnerability</button>
+        <button class="tab" onclick="switchTab('network')">Rec. Network</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat">
+          <div class="stat-val">6</div>
+          <div class="stat-label">Active Sites</div>
+          <div class="stat-badge badge-green">All online</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">74<span style="font-size:14px;font-weight:400;color:var(--text-dim)">/100</span></div>
+          <div class="stat-label">Avg Risk Score</div>
+          <div class="stat-badge badge-amber">Moderate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">3</div>
+          <div class="stat-label">Open Recommendations</div>
+          <div class="stat-badge badge-amber">2 high priority</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">91%</div>
+          <div class="stat-label">Control Effectiveness</div>
+          <div class="stat-badge badge-green">+3% vs prev</div>
+        </div>
+      </div>
+
+      <div class="card-row">
+        <!-- Risk by site -->
+        <div class="card">
+          <div class="card-title">Risk Profile by Site</div>
+          <div class="risk-row">
+            <div class="risk-label">Hamburg</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:62%;background:#3b9eff"></div></div>
+            <div class="risk-val">62</div>
+            <div class="risk-dot" style="background:#28c87a"></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-label">Johannesburg</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:81%;background:#f5a623"></div></div>
+            <div class="risk-val">81</div>
+            <div class="risk-dot" style="background:#f5a623"></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-label">Monterrey</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:73%;background:#3b9eff"></div></div>
+            <div class="risk-val">73</div>
+            <div class="risk-dot" style="background:#f5a623"></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-label">São Paulo</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:69%;background:#3b9eff"></div></div>
+            <div class="risk-val">69</div>
+            <div class="risk-dot" style="background:#28c87a"></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-label">Brisbane</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:54%;background:#28c87a"></div></div>
+            <div class="risk-val">54</div>
+            <div class="risk-dot" style="background:#28c87a"></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-label">Tokyo</div>
+            <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:89%;background:#e84545"></div></div>
+            <div class="risk-val">89</div>
+            <div class="risk-dot" style="background:#e84545"></div>
+          </div>
+        </div>
+
+        <!-- Dimension scores -->
+        <div class="card">
+          <div class="card-title">Portfolio Dimension Scores</div>
+          <div style="display:flex;justify-content:space-around;padding:8px 0">
+            <div class="score-ring">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#3b9eff" stroke-width="8"
+                    stroke-dasharray="238.76" stroke-dashoffset="57.3" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-inner">
+                  <div class="ring-val">76</div>
+                  <div class="ring-sub">%</div>
+                </div>
+              </div>
+              <div class="ring-label">Safety</div>
+            </div>
+            <div class="score-ring">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#28c87a" stroke-width="8"
+                    stroke-dasharray="238.76" stroke-dashoffset="52.5" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-inner">
+                  <div class="ring-val">78</div>
+                  <div class="ring-sub">%</div>
+                </div>
+              </div>
+              <div class="ring-label">Operations</div>
+            </div>
+            <div class="score-ring">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#f5a623" stroke-width="8"
+                    stroke-dasharray="238.76" stroke-dashoffset="83.6" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-inner">
+                  <div class="ring-val">65</div>
+                  <div class="ring-sub">%</div>
+                </div>
+              </div>
+              <div class="ring-label">Compliance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="card card-full">
+        <div class="card-title">Open Recommendations</div>
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Recommendation</th>
+              <th>Priority</th>
+              <th>Category</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tokyo</td>
+              <td>Emergency shutdown procedure review — high consequence event pathway identified</td>
+              <td><span class="pill pill-red">High</span></td>
+              <td>Safety</td>
+              <td><span class="pill pill-amber">In Progress</span></td>
+            </tr>
+            <tr>
+              <td>Johannesburg</td>
+              <td>Environmental compliance audit — permit renewal due Q2</td>
+              <td><span class="pill pill-red">High</span></td>
+              <td>Compliance</td>
+              <td><span class="pill pill-blue">Planned</span></td>
+            </tr>
+            <tr>
+              <td>Monterrey</td>
+              <td>Maintenance scheduling optimisation — MTTR reduction target 15%</td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td>Operations</td>
+              <td><span class="pill pill-blue">Planned</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IsoRisk tab -->
+    <div class="tab-panel" id="tab-isorisk">
+      <div class="tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab active" onclick="switchTab('isorisk')">IsoRisk</button>
+        <button class="tab" onclick="switchTab('vulnerability')">Vulnerability</button>
+        <button class="tab" onclick="switchTab('network')">Rec. Network</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+      </div>
+      <div class="card card-full">
+        <div class="card-title">IsoRisk Chart — Frequency / Consequence</div>
+        <div id="isoRiskCanvas" style="position:relative;height:380px;width:100%;overflow:hidden"></div>
+      </div>
+      <div class="card-row" style="margin-top:14px">
+        <div class="card">
+          <div class="card-title">Tolerability Boundaries</div>
+          <div class="risk-row" style="margin-bottom:12px">
+            <div class="risk-dot" style="background:#e84545;margin-right:6px"></div>
+            <div style="font-size:12px">Upper tolerability limit (UTL) — Broadly Unacceptable</div>
+          </div>
+          <div class="risk-row" style="margin-bottom:12px">
+            <div class="risk-dot" style="background:#f5a623;margin-right:6px"></div>
+            <div style="font-size:12px">ALARP region — Risk reduction required</div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-dot" style="background:#28c87a;margin-right:6px"></div>
+            <div style="font-size:12px">Lower tolerability limit (LTL) — Broadly Acceptable</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Site Positions</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">Hamburg</span><span class="pill pill-green">LTL</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">Brisbane</span><span class="pill pill-green">LTL</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">São Paulo</span><span class="pill pill-amber">ALARP</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">Monterrey</span><span class="pill pill-amber">ALARP</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">Johannesburg</span><span class="pill pill-amber">ALARP</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="color:var(--text-dim)">Tokyo</span><span class="pill pill-red">UTL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vulnerability tab -->
+    <div class="tab-panel" id="tab-vulnerability">
+      <div class="tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('isorisk')">IsoRisk</button>
+        <button class="tab active" onclick="switchTab('vulnerability')">Vulnerability</button>
+        <button class="tab" onclick="switchTab('network')">Rec. Network</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+      </div>
+      <div class="card card-full">
+        <div class="card-title">Vulnerability Assessment by Dimension</div>
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Safety</th>
+              <th>Operations</th>
+              <th>Environment</th>
+              <th>Compliance</th>
+              <th>Reputation</th>
+              <th>Overall</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">Hamburg</td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low (62)</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Johannesburg</td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-red">High</span></td>
+              <td><span class="pill pill-red">High</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">High (81)</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Monterrey</td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Med (73)</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">São Paulo</td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-amber">Med (69)</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Brisbane</td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low</span></td>
+              <td><span class="pill pill-green">Low (54)</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Tokyo</td>
+              <td><span class="pill pill-red">High</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-amber">Medium</span></td>
+              <td><span class="pill pill-red">High</span></td>
+              <td><span class="pill pill-red">High</span></td>
+              <td><span class="pill pill-red">High (89)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Rec Network tab -->
+    <div class="tab-panel" id="tab-network">
+      <div class="tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('isorisk')">IsoRisk</button>
+        <button class="tab" onclick="switchTab('vulnerability')">Vulnerability</button>
+        <button class="tab active" onclick="switchTab('network')">Rec. Network</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+      </div>
+      <div class="card card-full">
+        <div class="card-title">Recommendation Network Graph</div>
+        <div id="networkCanvas" style="position:relative;height:420px;overflow:hidden"></div>
+      </div>
+    </div>
+
+    <!-- Portfolio tab -->
+    <div class="tab-panel" id="tab-portfolio">
+      <div class="tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('isorisk')">IsoRisk</button>
+        <button class="tab" onclick="switchTab('vulnerability')">Vulnerability</button>
+        <button class="tab" onclick="switchTab('network')">Rec. Network</button>
+        <button class="tab active" onclick="switchTab('portfolio')">Portfolio</button>
+      </div>
+      <div class="stats-strip">
+        <div class="stat">
+          <div class="stat-val">6</div>
+          <div class="stat-label">Sites Monitored</div>
+          <div class="stat-badge badge-green">3 Continents</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">74</div>
+          <div class="stat-label">Portfolio Risk Index</div>
+          <div class="stat-badge badge-amber">Moderate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">14</div>
+          <div class="stat-label">Total Recommendations</div>
+          <div class="stat-badge badge-blue">11 closed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">91%</div>
+          <div class="stat-label">Control Effectiveness</div>
+          <div class="stat-badge badge-green">Target 90%</div>
+        </div>
+      </div>
+      <div class="card card-full">
+        <div class="card-title">Asset Portfolio</div>
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Region</th>
+              <th>Lat / Long</th>
+              <th>Risk Score</th>
+              <th>IsoRisk</th>
+              <th>Last Assessment</th>
+              <th>Next Review</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">Hamburg</td>
+              <td>Europe</td>
+              <td style="font-family:monospace;font-size:11px">53.55N / 9.99E</td>
+              <td><span class="pill pill-green">62</span></td>
+              <td><span class="pill pill-green">LTL</span></td>
+              <td style="color:var(--text-dim)">Jan 2025</td>
+              <td style="color:var(--text-dim)">Jul 2025</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Johannesburg</td>
+              <td>Africa</td>
+              <td style="font-family:monospace;font-size:11px">26.20S / 28.05E</td>
+              <td><span class="pill pill-amber">81</span></td>
+              <td><span class="pill pill-amber">ALARP</span></td>
+              <td style="color:var(--text-dim)">Dec 2024</td>
+              <td style="color:var(--text-dim)">Jun 2025</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Monterrey</td>
+              <td>N. America</td>
+              <td style="font-family:monospace;font-size:11px">25.69N / 100.32W</td>
+              <td><span class="pill pill-amber">73</span></td>
+              <td><span class="pill pill-amber">ALARP</span></td>
+              <td style="color:var(--text-dim)">Feb 2025</td>
+              <td style="color:var(--text-dim)">Aug 2025</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">São Paulo</td>
+              <td>S. America</td>
+              <td style="font-family:monospace;font-size:11px">23.55S / 46.63W</td>
+              <td><span class="pill pill-amber">69</span></td>
+              <td><span class="pill pill-amber">ALARP</span></td>
+              <td style="color:var(--text-dim)">Jan 2025</td>
+              <td style="color:var(--text-dim)">Jul 2025</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Brisbane</td>
+              <td>Asia-Pacific</td>
+              <td style="font-family:monospace;font-size:11px">27.47S / 153.03E</td>
+              <td><span class="pill pill-green">54</span></td>
+              <td><span class="pill pill-green">LTL</span></td>
+              <td style="color:var(--text-dim)">Mar 2025</td>
+              <td style="color:var(--text-dim)">Sep 2025</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Tokyo</td>
+              <td>Asia-Pacific</td>
+              <td style="font-family:monospace;font-size:11px">35.69N / 139.69E</td>
+              <td><span class="pill pill-red">89</span></td>
+              <td><span class="pill pill-red">UTL</span></td>
+              <td style="color:var(--text-dim)">Dec 2024</td>
+              <td style="color:var(--text-dim)">Jun 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Tabs ──────────────────────────────────────────────────
+const TITLES = {
+  overview: 'Overview',
+  isorisk: 'IsoRisk Analysis',
+  vulnerability: 'Vulnerability Map',
+  network: 'Recommendation Network',
+  portfolio: 'Asset Portfolio'
+};
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('tab-' + id);
+  if (panel) panel.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().toLowerCase().startsWith(TITLES[id]?.split(' ')[0].toLowerCase() || id)) {
+      n.classList.add('active');
+    }
+  });
+  document.getElementById('pageTitle').textContent = TITLES[id] || id;
+  if (id === 'isorisk') drawIsoRisk();
+  if (id === 'network') drawNetwork();
+}
+
+// ── Date ──────────────────────────────────────────────────
+document.getElementById('pageDate').textContent = new Date().toLocaleDateString('en-GB', {
+  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+});
+
+// ── Session ───────────────────────────────────────────────
+fetch('/api/christobal/session')
+  .then(r => r.json())
+  .then(d => {
+    if (!d.authenticated) { window.location.href = '/'; return; }
+    const email = d.email || '';
+    document.getElementById('userEmail').textContent = email;
+    document.getElementById('userAvatar').textContent = email[0].toUpperCase();
+  })
+  .catch(() => { window.location.href = '/'; });
+
+document.getElementById('signOutBtn').addEventListener('click', function() {
+  fetch('/api/christobal/logout', { method: 'POST' })
+    .finally(() => { window.location.href = '/'; });
+});
+
+// ── IsoRisk chart (canvas) ────────────────────────────────
+function drawIsoRisk() {
+  const wrap = document.getElementById('isoRiskCanvas');
+  if (!wrap || wrap.querySelector('canvas')) return;
+
+  const W = wrap.clientWidth || 600;
+  const H = 380;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%';
+  wrap.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  const PAD = { top: 24, right: 24, bottom: 50, left: 60 };
+  const pw = W - PAD.left - PAD.right;
+  const ph = H - PAD.top - PAD.bottom;
+
+  // Background
+  ctx.fillStyle = '#111b28';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const x = PAD.left + (i / 5) * pw;
+    const y = PAD.top + (i / 5) * ph;
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + pw, y); ctx.stroke();
+  }
+
+  // IsoRisk lines (log-log)
+  const xMap = f => PAD.left + ((Math.log10(f) + 5) / 5) * pw;
+  const yMap = c => PAD.top + ph - ((Math.log10(c)) / 5) * ph;
+
+  function drawIsoLine(color, label, offset) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    // Isoline: F * C = constant → log F = log(K) - log C
+    const K = Math.pow(10, offset);
+    const cMin = 1, cMax = 1e5;
+    const fMin = K / cMax, fMax = K / cMin;
+    if (fMax < 1e-5 || fMin > 1) return;
+    const c0 = cMin, f0 = K / c0;
+    const c1 = cMax, f1 = K / c1;
+    ctx.moveTo(xMap(f0 < 1e-5 ? 1e-5 : f0), yMap(c0));
+    ctx.lineTo(xMap(f1 > 1 ? 1 : f1), yMap(c1 > 1e5 ? 1e5 : c1));
+    ctx.stroke();
+  }
+
+  // ALARP zones
+  const gAlarp = ctx.createLinearGradient(PAD.left, PAD.top, PAD.left + pw, PAD.top + ph);
+  gAlarp.addColorStop(0, 'rgba(232,69,69,0.06)');
+  gAlarp.addColorStop(0.5, 'rgba(245,166,35,0.06)');
+  gAlarp.addColorStop(1, 'rgba(40,200,122,0.06)');
+  ctx.fillStyle = gAlarp;
+  ctx.fillRect(PAD.left, PAD.top, pw, ph);
+
+  // Isoline bands
+  for (let k = -6; k <= -2; k++) drawIsoLine('rgba(59,158,255,0.2)', '', k);
+  drawIsoLine('#e84545', 'UTL', -3);
+  drawIsoLine('#28c87a', 'LTL', -5);
+
+  // Axes labels
+  ctx.fillStyle = 'rgba(120,160,200,0.6)';
+  ctx.font = '11px Segoe UI, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Consequence →', PAD.left + pw / 2, H - 10);
+  ctx.save();
+  ctx.translate(14, PAD.top + ph / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Frequency →', 0, 0);
+  ctx.restore();
+
+  // Site dots
+  const sites = [
+    { name: 'Hamburg',      f: 2e-4, c: 5e2,  color: '#28c87a', risk: 62 },
+    { name: 'Brisbane',     f: 1e-4, c: 3e2,  color: '#28c87a', risk: 54 },
+    { name: 'São Paulo',    f: 8e-4, c: 2e3,  color: '#f5a623', risk: 69 },
+    { name: 'Monterrey',    f: 5e-4, c: 3e3,  color: '#f5a623', risk: 73 },
+    { name: 'Johannesburg', f: 2e-3, c: 5e3,  color: '#f5a623', risk: 81 },
+    { name: 'Tokyo',        f: 5e-3, c: 2e4,  color: '#e84545', risk: 89 },
+  ];
+
+  sites.forEach(s => {
+    const x = xMap(s.f), y = yMap(s.c);
+    if (x < PAD.left || x > PAD.left + pw || y < PAD.top || y > PAD.top + ph) return;
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = s.color + '30';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Segoe UI, system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(s.name + ' (' + s.risk + ')', x + 10, y + 4);
+  });
+}
+
+// ── Rec Network (canvas) ──────────────────────────────────
+function drawNetwork() {
+  const wrap = document.getElementById('networkCanvas');
+  if (!wrap || wrap.querySelector('canvas')) return;
+
+  const W = wrap.clientWidth || 700;
+  const H = 420;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%';
+  wrap.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#111b28';
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2;
+
+  const nodes = [
+    { label: 'Risk Profile', x: cx, y: cy, r: 32, color: '#3b9eff' },
+    { label: 'Tokyo Safety', x: cx - 200, y: cy - 120, r: 22, color: '#e84545' },
+    { label: 'JHB Compliance', x: cx + 200, y: cy - 120, r: 22, color: '#f5a623' },
+    { label: 'Monterrey Ops', x: cx + 210, y: cy + 100, r: 18, color: '#f5a623' },
+    { label: 'Emergency Plan', x: cx - 220, y: cy + 90, r: 18, color: '#28c87a' },
+    { label: 'Env Audit', x: cx + 60, y: cy - 160, r: 14, color: '#28c87a' },
+    { label: 'MTTR Target', x: cx + 170, y: cy + 30, r: 14, color: '#3b9eff' },
+    { label: 'Control Review', x: cx - 140, y: cy + 40, r: 14, color: '#3b9eff' },
+  ];
+
+  const edges = [
+    [0, 1], [0, 2], [0, 3], [0, 4],
+    [1, 7], [2, 5], [3, 6], [4, 7],
+    [5, 2], [6, 3]
+  ];
+
+  edges.forEach(([a, b]) => {
+    const na = nodes[a], nb = nodes[b];
+    const grad = ctx.createLinearGradient(na.x, na.y, nb.x, nb.y);
+    grad.addColorStop(0, na.color + '40');
+    grad.addColorStop(1, nb.color + '40');
+    ctx.beginPath();
+    ctx.moveTo(na.x, na.y);
+    ctx.lineTo(nb.x, nb.y);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = n.color + '18';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.strokeStyle = n.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${Math.max(9, n.r / 2.2)}px Segoe UI, system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (n.label.includes(' ')) {
+      const parts = n.label.split(' ');
+      ctx.fillText(parts[0], n.x, n.y - 6);
+      ctx.fillText(parts.slice(1).join(' '), n.x, n.y + 7);
+    } else {
+      ctx.fillText(n.label, n.x, n.y);
+    }
+  });
+}
+</script>
+</body>
+</html>

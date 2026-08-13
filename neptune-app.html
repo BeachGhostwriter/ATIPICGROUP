@@ -3,815 +3,742 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neptune — Water Intelligence Dashboard</title>
+<title>Neptune — Water Intelligence Platform</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <style>
-/* ── Tokens ──────────────────────────────────────────────── */
 :root {
-  --sidebar-bg:   #0A1F30;
-  --sidebar-text: rgba(220,235,245,0.82);
-  --sidebar-act:  #1D7A8C;
-  --sidebar-hov:  rgba(255,255,255,0.07);
-  --bg:           #F1F5F8;
-  --surface:      #FFFFFF;
-  --ink:          #0D1E2D;
-  --ink-2:        #3B566A;
-  --ink-3:        #6A8598;
-  --border:       #CCDAE4;
-  --accent:       #1D7A8C;
-  --accent-lt:    #DDF0F5;
-  --s1:           #C5402E;   /* severe   */
-  --s2:           #D4762A;   /* high     */
-  --s3:           #C9A820;   /* moderate */
-  --s4:           #3A8A5E;   /* low      */
-  --s5:           #1D7A8C;   /* minimal  */
-  --radius:       6px;
-  --sidebar-w:    220px;
+  --sb-bg:    #0A1F30; --sb-text: rgba(220,235,245,0.82); --sb-act: #1D7A8C; --sb-hov: rgba(255,255,255,0.07);
+  --bg:       #F1F5F8; --surface: #FFFFFF; --ink: #0D1E2D; --ink-2: #3B566A; --ink-3: #6A8598;
+  --border:   #CCDAE4; --accent: #1D7A8C; --accent-lt: #DDF0F5;
+  --s1:#C5402E; --s2:#D4762A; --s3:#C9A820; --s4:#3A8A5E; --s5:#1D7A8C;
+  --green:#2ea44f; --red:#e74c3c; --blue:#4a90d9;
+  --radius:6px; --sw:220px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:       #0B1B27;
-    --surface:  #112030;
-    --ink:      #D8ECF5;
-    --ink-2:    #7AAAC0;
-    --ink-3:    #4A7590;
-    --border:   #1C3548;
-    --accent:   #2A9CB4;
-    --accent-lt:#0F2B3A;
-  }
-}
-:root[data-theme="light"] {
-  --bg:#F1F5F8; --surface:#FFFFFF; --ink:#0D1E2D; --ink-2:#3B566A;
-  --ink-3:#6A8598; --border:#CCDAE4; --accent:#1D7A8C; --accent-lt:#DDF0F5;
-}
-:root[data-theme="dark"] {
-  --bg:#0B1B27; --surface:#112030; --ink:#D8ECF5; --ink-2:#7AAAC0;
-  --ink-3:#4A7590; --border:#1C3548; --accent:#2A9CB4; --accent-lt:#0F2B3A;
-}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0B1B27;--surface:#112030;--ink:#D8ECF5;--ink-2:#7AAAC0;--ink-3:#4A7590;
+  --border:#1C3548;--accent:#2A9CB4;--accent-lt:#0F2B3A;
+}}
+:root[data-theme="light"]{--bg:#F1F5F8;--surface:#fff;--ink:#0D1E2D;--ink-2:#3B566A;--ink-3:#6A8598;--border:#CCDAE4;--accent:#1D7A8C;--accent-lt:#DDF0F5;}
+:root[data-theme="dark"]{--bg:#0B1B27;--surface:#112030;--ink:#D8ECF5;--ink-2:#7AAAC0;--ink-3:#4A7590;--border:#1C3548;--accent:#2A9CB4;--accent-lt:#0F2B3A;}
 
-/* ── Reset ───────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: system-ui, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  color: var(--ink);
-  background: var(--bg);
-  display: flex;
-  min-height: 100vh;
-}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;font-family:system-ui,'Segoe UI',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);display:flex;min-height:100vh;}
 
-/* ── Sidebar ─────────────────────────────────────────────── */
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--sidebar-bg);
-  color: var(--sidebar-text);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 100;
-  overflow-y: auto;
-}
-.sidebar-top {
-  padding: 24px 20px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.sidebar-brand {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.sidebar-title {
-  font-size: 19px;
-  font-weight: 300;
-  color: #fff;
-  letter-spacing: 0.01em;
-}
-.sidebar-nav {
-  padding: 14px 12px;
-  flex: 1;
-}
-.nav-label {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(220,235,245,0.38);
-  padding: 14px 8px 6px;
-  font-weight: 600;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--sidebar-text);
-  text-decoration: none;
-  transition: background 0.15s;
-}
-.nav-item:hover { background: var(--sidebar-hov); }
-.nav-item.active {
-  background: var(--sidebar-act);
-  color: #fff;
-}
-.nav-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-.nav-item.active .nav-icon { opacity: 1; }
-.sidebar-bottom {
-  padding: 14px 12px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-}
-.user-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: var(--radius);
-  background: rgba(255,255,255,0.05);
-}
-.user-avatar {
-  width: 28px; height: 28px;
-  background: var(--sidebar-act);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: #fff;
-  flex-shrink: 0;
-}
-.user-name { font-size: 12px; color: rgba(220,235,245,0.9); }
-.user-role { font-size: 10px; color: rgba(220,235,245,0.45); }
-.sign-out-btn {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  margin-top: 8px;
-  padding: 8px 10px;
-  border: none;
-  background: none;
-  color: rgba(220,235,245,0.5);
-  font-size: 12px;
-  cursor: pointer;
-  border-radius: var(--radius);
-  text-align: left;
-  transition: background 0.15s, color 0.15s;
-}
-.sign-out-btn:hover { background: rgba(197,64,46,0.15); color: #F08070; }
+.sidebar{width:var(--sw);background:var(--sb-bg);color:var(--sb-text);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
+.sb-top{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sb-brand{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px;}
+.sb-title{font-size:19px;font-weight:300;color:#fff;letter-spacing:.01em;}
+.sb-nav{padding:14px 12px;flex:1;}
+.nav-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(220,235,245,0.38);padding:14px 8px 6px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--sb-text);text-decoration:none;transition:background .15s;}
+.nav-item:hover{background:var(--sb-hov);}
+.nav-item.active{background:var(--sb-act);color:#fff;}
+.ni{width:15px;height:15px;flex-shrink:0;opacity:.7;}
+.nav-item.active .ni{opacity:1;}
+.sb-bottom{padding:14px 12px;border-top:1px solid rgba(255,255,255,0.07);}
+.user-chip{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);background:rgba(255,255,255,0.05);}
+.u-av{width:28px;height:28px;background:var(--sb-act);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.u-name{font-size:12px;color:rgba(220,235,245,.9);}
+.u-role{font-size:10px;color:rgba(220,235,245,.45);}
+.sign-out{display:flex;align-items:center;gap:9px;width:100%;margin-top:8px;padding:8px 10px;border:none;background:none;color:rgba(220,235,245,.5);font-size:12px;cursor:pointer;border-radius:var(--radius);text-align:left;transition:background .15s,color .15s;}
+.sign-out:hover{background:rgba(197,64,46,.15);color:#F08070;}
 
-/* ── Main ────────────────────────────────────────────────── */
-.main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 32px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-.page-title {
-  font-family: ui-serif, Georgia, serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--ink);
-  margin: 0;
-}
-.topbar-meta {
-  font-size: 11px;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-.topbar-meta a {
-  color: var(--accent);
-  text-decoration: none;
-}
-.topbar-meta a:hover { text-decoration: underline; }
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-width:0;}
+.section{display:flex;flex-direction:column;min-height:100vh;}
+.section.hidden{display:none;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-shrink:0;}
+.pg-title{font-family:ui-serif,Georgia,serif;font-size:22px;font-weight:400;color:var(--ink);margin:0;}
+.topbar-meta{font-size:11px;color:var(--ink-3);white-space:nowrap;}
+.topbar-meta a{color:var(--accent);text-decoration:none;}
+.content{padding:28px 32px 48px;flex:1;}
 
-/* ── Content ─────────────────────────────────────────────── */
-.content { padding: 28px 32px 48px; flex: 1; }
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.kpi-stripe{height:3px;border-radius:2px;margin-bottom:12px;}
+.kpi-val{font-size:28px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.1;}
+.kpi-unit{font-size:14px;font-weight:400;color:var(--ink-3);margin-left:2px;}
+.kpi-lbl{font-size:11px;color:var(--ink-3);margin-top:5px;text-transform:uppercase;letter-spacing:.07em;}
 
-/* ── KPI Strip ───────────────────────────────────────────── */
-.kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
-.kpi {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-}
-.kpi-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.kpi-unit {
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--ink-3);
-  margin-left: 2px;
-}
-.kpi-label {
-  font-size: 11px;
-  color: var(--ink-3);
-  margin-top: 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-.kpi-stripe {
-  height: 3px;
-  border-radius: 2px;
-  margin-bottom: 12px;
-}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;margin-top:32px;}
+.sec-head:first-child{margin-top:0;}
+.sec-title{font-family:ui-serif,Georgia,serif;font-size:16px;font-weight:400;color:var(--ink);margin:0;}
+.sec-sub{font-size:11px;color:var(--ink-3);}
 
-/* ── Section header ──────────────────────────────────────── */
-.section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  margin-top: 32px;
-}
-.section-head:first-child { margin-top: 0; }
-.section-title {
-  font-family: ui-serif, Georgia, serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--ink);
-  margin: 0;
-}
-.section-sub {
-  font-size: 11px;
-  color: var(--ink-3);
-}
+/* WEI chart */
+.wei-chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;}
+.wei-row{display:grid;grid-template-columns:110px 1fr 52px;align-items:center;gap:10px;padding:4px 0;}
+.wei-country{font-size:12px;color:var(--ink-2);text-align:right;white-space:nowrap;}
+.wei-bwrap{background:var(--bg);border-radius:2px;height:14px;position:relative;overflow:hidden;}
+.wei-bar{height:100%;border-radius:2px;transition:width .6s ease;}
+.wei-thresh{position:absolute;top:0;bottom:0;width:1px;background:var(--ink-3);opacity:.4;}
+.wei-val{font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-2);font-family:ui-monospace,'Consolas',monospace;text-align:right;}
+.wei-legend{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-3);}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
 
-/* ── WEI Bar Chart ───────────────────────────────────────── */
-.wei-chart {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 24px;
-}
-.wei-row {
-  display: grid;
-  grid-template-columns: 110px 1fr 52px;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
-}
-.wei-country {
-  font-size: 12px;
-  color: var(--ink-2);
-  text-align: right;
-  white-space: nowrap;
-}
-.wei-bar-wrap {
-  background: var(--bg);
-  border-radius: 2px;
-  height: 14px;
-  position: relative;
-  overflow: hidden;
-}
-.wei-bar {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.6s ease;
-}
-.wei-threshold {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: var(--ink-3);
-  opacity: 0.4;
-}
-.wei-val {
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-  font-family: ui-monospace, 'Consolas', monospace;
-  text-align: right;
-}
-.wei-legend {
-  display: flex;
-  gap: 16px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--ink-3);
-}
-.legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
+/* Two-col */
+.two-col{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
 
-/* ── Two-col layout ──────────────────────────────────────── */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 18px;
-  align-items: start;
-}
+/* Data table */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;}
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.dt th{background:var(--bg);color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;}
+table.dt td{padding:8px 14px;border-bottom:1px solid var(--border);color:var(--ink);vertical-align:middle;}
+table.dt tr:last-child td{border-bottom:none;}
+table.dt tr:hover td{background:var(--bg);}
+.td-num{font-variant-numeric:tabular-nums;font-family:ui-monospace,'Consolas',monospace;font-size:12px;text-align:right;}
+.chip{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600;letter-spacing:.04em;white-space:nowrap;}
 
-/* ── Country Table ───────────────────────────────────────── */
-.data-table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow-x: auto;
-}
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12.5px;
-}
-.data-table th {
-  background: var(--bg);
-  color: var(--ink-3);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 10px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
-  white-space: nowrap;
-}
-.data-table td {
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  color: var(--ink);
-  vertical-align: middle;
-}
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--bg); }
-.td-num {
-  font-variant-numeric: tabular-nums;
-  font-family: ui-monospace, 'Consolas', monospace;
-  font-size: 12px;
-  text-align: right;
-}
-.stress-chip {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
+/* Sector */
+.sector-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;}
+.sector-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;}
+canvas{display:block;}
+.sector-list{margin-top:16px;display:flex;flex-direction:column;gap:7px;}
+.sector-row{display:grid;grid-template-columns:12px 1fr auto;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);}
+.sector-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.sector-pct{font-variant-numeric:tabular-nums;font-family:ui-monospace,'Consolas',monospace;color:var(--ink);font-weight:600;font-size:12px;}
 
-/* ── Sector Panel ────────────────────────────────────────── */
-.sector-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 18px;
-}
-.sector-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 14px;
-}
-canvas { display: block; }
-.sector-list {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.sector-row {
-  display: grid;
-  grid-template-columns: 12px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--ink-2);
-}
-.sector-dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-.sector-pct {
-  font-variant-numeric: tabular-nums;
-  font-family: ui-monospace, 'Consolas', monospace;
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 12px;
-}
+/* Form inputs */
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em;}
+.field input,.field select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;font-size:13px;color:var(--ink);width:100%;font-family:inherit;transition:border-color .15s;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
+.field input[type=range]{padding:4px 0;border:none;background:none;}
 
-/* ── Source footer ───────────────────────────────────────── */
-.source-footer {
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.source-label {
-  font-size: 10px;
-  color: var(--ink-3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.source-link {
-  font-size: 11px;
-  color: var(--accent);
-  text-decoration: none;
-}
-.source-link:hover { text-decoration: underline; }
+/* Btn */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:background .15s,opacity .15s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{background:var(--bg);border:1px solid var(--border);color:var(--ink);}
+.btn-ghost:hover{background:var(--border);}
 
-/* ── Auth overlay ────────────────────────────────────────── */
-.auth-overlay {
-  position: fixed; inset: 0;
-  background: var(--sidebar-bg);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--sidebar-text);
-  font-size: 14px;
-}
+/* Treatment stages */
+.stage-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.stage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:grid;grid-template-columns:160px 1fr auto;gap:12px;align-items:center;}
+.stage-name{font-size:13px;font-weight:600;color:var(--ink);}
+.stage-tier{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);}
+.stage-desc{font-size:12px;color:var(--ink-3);line-height:1.4;}
 
-/* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 900px) {
-  :root { --sidebar-w: 0px; }
-  .sidebar { transform: translateX(-220px); }
-  .main { margin-left: 0; }
-  .kpi-strip { grid-template-columns: 1fr 1fr; }
-  .two-col { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .kpi-strip { grid-template-columns: 1fr; }
-  .content { padding: 18px 16px 40px; }
-}
+/* Chart container */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:18px;}
+.chart-canvas-wrap{position:relative;width:100%;}
+.chart-canvas-wrap canvas{width:100%;display:block;}
+
+/* Info banner */
+.info-banner{background:var(--accent-lt);border:1px solid var(--accent);border-radius:var(--radius);padding:10px 16px;font-size:12px;color:var(--ink-2);margin-bottom:20px;}
+.country-stress-bar{display:flex;align-items:center;gap:12px;margin-top:12px;}
+.stress-track{flex:1;height:8px;background:linear-gradient(to right,#1a9850,#91cf60,#fee08b,#fc8d59,#d73027);border-radius:4px;position:relative;}
+.stress-marker{position:absolute;top:-4px;width:16px;height:16px;background:var(--ink);border:2px solid #fff;border-radius:50%;transform:translateX(-50%);box-shadow:0 1px 4px rgba(0,0,0,.3);}
+
+/* Auth overlay */
+.auth-overlay{position:fixed;inset:0;background:var(--sb-bg);z-index:999;display:flex;align-items:center;justify-content:center;color:var(--sb-text);font-size:14px;}
+
+/* Source footer */
+.src-footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap;align-items:center;}
+.src-label{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em;}
+.src-link{font-size:11px;color:var(--accent);text-decoration:none;}
+.src-link:hover{text-decoration:underline;}
+
+/* Removal chain table */
+.removal-wrap{overflow-x:auto;}
+.removal-bar{height:8px;border-radius:2px;background:var(--green);}
+
+/* Responsive */
+@media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);}.main{margin-left:0;}.kpi-strip,.form-grid{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}}
+@media(max-width:600px){.kpi-strip,.form-grid{grid-template-columns:1fr;}.content{padding:18px 16px 40px;}}
 </style>
 </head>
 <body>
 
 <div class="auth-overlay" id="authOverlay">Verifying session…</div>
 
-<!-- Sidebar -->
 <aside class="sidebar">
-  <div class="sidebar-top">
-    <div class="sidebar-brand">AT-IPIC Group</div>
-    <div class="sidebar-title">Neptune</div>
+  <div class="sb-top">
+    <div class="sb-brand">AT-IPIC Group</div>
+    <div class="sb-title">Neptune</div>
   </div>
-
-  <nav class="sidebar-nav">
-    <div class="nav-label">Intelligence</div>
-    <a class="nav-item active" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
-        <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
-      </svg>
+  <nav class="sb-nav">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item active" data-sec="dashboard" href="#" onclick="showSec('dashboard');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
       Dashboard
     </a>
-    <a class="nav-item" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="8" cy="8" r="6"/><path d="M2.5 8h11M8 2.5C6.5 5 6.5 11 8 13.5M8 2.5C9.5 5 9.5 11 8 13.5"/>
-      </svg>
-      Water Stress Map
+    <div class="nav-label">Configuration</div>
+    <a class="nav-item" data-sec="country" href="#" onclick="showSec('country');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M2.5 8h11M8 2.5C6.5 5 6.5 11 8 13.5M8 2.5C9.5 5 9.5 11 8 13.5"/></svg>
+      Country &amp; Region
     </a>
-    <a class="nav-item" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M2 12 L5 7 L8 9 L11 4 L14 6"/><circle cx="14" cy="6" r="1.2" fill="currentColor" stroke="none"/>
-      </svg>
-      Trend Analysis
+    <a class="nav-item" data-sec="company" href="#" onclick="showSec('company');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M5 5V3a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M8 9v2"/></svg>
+      Company Data
     </a>
-    <a class="nav-item" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M8 1v4M8 11v4M1 8h4M11 8h4"/><circle cx="8" cy="8" r="3"/>
-      </svg>
-      Treatment Planner
+    <a class="nav-item" data-sec="treatment" href="#" onclick="showSec('treatment');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v4M8 11v4M1 8h4M11 8h4"/><circle cx="8" cy="8" r="3"/></svg>
+      Treatment Solutions
     </a>
-    <div class="nav-label">Reports</div>
-    <a class="nav-item" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="3" y="1" width="10" height="14" rx="1"/><path d="M6 5h4M6 8h4M6 11h2"/>
-      </svg>
-      Country Profiles
+    <div class="nav-label">Economics</div>
+    <a class="nav-item" data-sec="ebitda" href="#" onclick="showSec('ebitda');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 7 L8 9 L11 4 L14 6"/><circle cx="14" cy="6" r="1.2" fill="currentColor" stroke="none"/></svg>
+      EBITDA Bridge
     </a>
-    <a class="nav-item" href="#">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M2 14V6l4-4h8v12H2z"/><path d="M6 2v4H2"/>
-      </svg>
-      EEA Data Export
+    <a class="nav-item" data-sec="capex" href="#" onclick="showSec('capex');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="10" width="3" height="5" rx="1"/><rect x="6" y="7" width="3" height="8" rx="1"/><rect x="11" y="3" width="3" height="12" rx="1"/></svg>
+      CapEx / OpEx
+    </a>
+    <div class="nav-label">MIKE Solutions</div>
+    <a class="nav-item" data-sec="kinetics" href="#" onclick="showSec('kinetics');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13 C4 10 6 12 8 9 S10 4 12 6 L14 4"/></svg>
+      Process Kinetics
+    </a>
+    <a class="nav-item" data-sec="carbon" href="#" onclick="showSec('carbon');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z"/><path d="M5 8h6M8 5v6"/></svg>
+      Carbon Footprint
+    </a>
+    <a class="nav-item" data-sec="flood" href="#" onclick="showSec('flood');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 11 Q4 8 7 11 Q10 14 13 11"/><path d="M1 7 Q4 4 7 7 Q10 10 13 7"/><path d="M8 1v3"/><circle cx="8" cy="1.5" r="1" fill="currentColor" stroke="none"/></svg>
+      Flood &amp; Rainfall
+    </a>
+    <a class="nav-item" data-sec="site" href="#" onclick="showSec('site');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 0110 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+      Site Intelligence
+    </a>
+    <a class="nav-item" data-sec="heatmap" href="#" onclick="showSec('heatmap');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1" fill="rgba(231,76,60,.4)" stroke="none"/><rect x="9" y="1" width="6" height="6" rx="1" fill="rgba(243,156,18,.4)" stroke="none"/><rect x="1" y="9" width="6" height="6" rx="1" fill="rgba(46,164,79,.4)" stroke="none"/><rect x="9" y="9" width="6" height="6" rx="1" fill="rgba(74,144,217,.4)" stroke="none"/><rect x="1" y="1" width="14" height="14" rx="2"/></svg>
+      Site Heat Map
+    </a>
+    <div class="nav-label">Analytics</div>
+    <a class="nav-item" data-sec="sankey" href="#" onclick="showSec('sankey');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 4h4v3h6v2H5v3H1"/><path d="M5 7h6"/><path d="M1 9h4"/><path d="M11 6h4M11 9h4"/></svg>
+      Water Flow (Sankey)
+    </a>
+    <a class="nav-item" data-sec="leakdetect" href="#" onclick="showSec('leakdetect');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2 L8 9 M6 7 Q8 11 10 7"/><circle cx="8" cy="13" r="2"/><path d="M4 5 Q2 8 4 11M12 5 Q14 8 12 11"/></svg>
+      Leak Detection
+    </a>
+    <a class="nav-item" data-sec="compare" href="#" onclick="showSec('compare');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="9" width="4" height="6" rx="1"/><rect x="6" y="6" width="4" height="9" rx="1"/><rect x="11" y="3" width="4" height="12" rx="1"/></svg>
+      Scenario Comparison
+    </a>
+    <a class="nav-item" data-sec="trends" href="#" onclick="showSec('trends');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12 L4 8 L7 10 L10 5 L13 7 L15 4"/></svg>
+      Results &amp; Trends
+    </a>
+    <div class="nav-label">Data</div>
+    <a class="nav-item" data-sec="scada" href="#" onclick="showSec('scada');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="10" rx="1"/><path d="M4 12v2M12 12v2M4 14h8"/><path d="M4 7l2-2 2 3 2-4 2 2"/></svg>
+      SCADA Analysis
+    </a>
+    <a class="nav-item" data-sec="eea" href="#" onclick="showSec('eea');return false;">
+      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V6l4-4h8v12H2z"/><path d="M6 2v4H2"/></svg>
+      EEA Water Stress
     </a>
   </nav>
-
-  <div class="sidebar-bottom">
+  <div class="sb-bottom">
     <div class="user-chip">
-      <div class="user-avatar" id="userAvatar">A</div>
-      <div>
-        <div class="user-name" id="userEmail">—</div>
-        <div class="user-role">Neptune User</div>
-      </div>
+      <div class="u-av" id="uAv">A</div>
+      <div><div class="u-name" id="uEmail">—</div><div class="u-role">Neptune Platform</div></div>
     </div>
-    <button class="sign-out-btn" onclick="signOut()">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M11 5l3 3-3 3M7 8h7"/><path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h4"/>
-      </svg>
+    <button class="sign-out" onclick="signOut()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5l3 3-3 3M7 8h7"/><path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h4"/></svg>
       Sign out
     </button>
   </div>
 </aside>
 
-<!-- Main -->
 <div class="main">
+
+<!-- ═══ DASHBOARD ═══════════════════════════════════════════════════════════ -->
+<div id="sec-dashboard" class="section">
   <div class="topbar">
-    <h1 class="page-title">European Water Stress — Overview</h1>
-    <span class="topbar-meta">
-      Source: <a href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA Indicator IND-111</a>
-      &nbsp;·&nbsp; Water Exploitation Index Plus (WEI+) &nbsp;·&nbsp; Latest available data
-    </span>
+    <h1 class="pg-title">Dashboard — Water Intelligence</h1>
+    <span class="topbar-meta" id="dashMeta">Bremen Steel Works · Bremen, Germany</span>
   </div>
-
   <div class="content">
+    <div class="kpi-strip" id="dashKpis">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="dk1">—</div><div class="kpi-lbl">Annual Water Cost</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="dk2">—</div><div class="kpi-lbl">Net EBITDA Improvement</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="dk3">—</div><div class="kpi-lbl">Target Water Recycling</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="dk4">—</div><div class="kpi-lbl">Treatment CAPEX Est.</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Project Summary</h2><span class="sec-sub" id="dashTxSub"></span></div>
+    <div class="kpi-strip" id="dashKpis2">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="dk5">—</div><div class="kpi-lbl">Simple Payback</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="dk6">—</div><div class="kpi-lbl">20-yr NPV</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="dk7">—</div><div class="kpi-lbl">IRR</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s5)"></div><div class="kpi-val" id="dk8">—</div><div class="kpi-lbl">Inlet Flow</div></div>
+    </div>
+  </div>
+</div>
 
-    <!-- KPIs -->
+<!-- ═══ COUNTRY & REGION ═══════════════════════════════════════════════════ -->
+<div id="sec-country" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Country &amp; Region</h1><span class="topbar-meta">Water stress, climate risk &amp; regulatory discharge limits</span></div>
+  <div class="content">
+    <div class="form-grid-3">
+      <div class="field"><label>Country</label>
+        <select id="cntrySelect" onchange="onCountryChange()"></select>
+      </div>
+      <div class="field"><label>Fresh Water Cost (€/m³)</label><input type="number" id="wCost" step="0.01" min="0" value="0.35" onchange="state.water_cost_eur_m3=+this.value;refreshAll();"></div>
+      <div class="field"><label>Discharge Permit Cost (€/m³)</label><input type="number" id="dCost" step="0.01" min="0" value="0.45" onchange="state.discharge_cost_eur_m3=+this.value;refreshAll();"></div>
+    </div>
+    <div id="countryStressCard" class="info-banner"></div>
+    <div class="sec-head"><h2 class="sec-title">Regulatory Discharge Limits</h2><span class="sec-sub" id="limitsSub"></span></div>
+    <div class="tbl-wrap"><table class="dt" id="limitsTable">
+      <thead><tr><th>Parameter</th><th>Limit</th><th>Unit</th><th>Notes</th></tr></thead>
+      <tbody id="limitsTbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ COMPANY DATA ════════════════════════════════════════════════════════ -->
+<div id="sec-company" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Company Data</h1><span class="topbar-meta" id="companyMeta">Process water balance &amp; contaminant profile</span></div>
+  <div class="content">
+    <div class="sec-head"><h2 class="sec-title">Site Configuration</h2></div>
+    <div class="form-grid">
+      <div class="field"><label>Company Name</label><input type="text" id="compName" value="Bremen Steel Works" onchange="state.company_name=this.value;refreshDash();"></div>
+      <div class="field"><label>Site</label><input type="text" id="compSite" value="Bremen, Germany" onchange="state.site=this.value;refreshDash();"></div>
+      <div class="field"><label>Industry</label><input type="text" id="compIndustry" value="Integrated Steel Plant" onchange="state.industry=this.value;"></div>
+      <div class="field"><label>Operating Hours (h/yr)</label><input type="number" id="opHours" value="8760" min="1" max="8760" onchange="state.operating_hours=+this.value;refreshAll();"></div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label>Total Inlet Flow (m³/h)</label><input type="number" id="inletFlow" value="6589.3" step="10" onchange="state.total_inlet_flow=+this.value;refreshAll();"></div>
+      <div class="field"><label>Discharge Flow (m³/h)</label><input type="number" id="dischFlow" value="6247.0" step="10" onchange="state.discharge_flow=+this.value;refreshAll();"></div>
+      <div class="field"><label>Pre-treatment Flow (m³/h)</label><input type="number" id="ptFlow" value="2764.3" step="10" onchange="state.pretreatment_flow_m3h=+this.value;refreshAll();"></div>
+      <div class="field"><label>WWT Flow (m³/h)</label><input type="number" id="wwtFlow" value="2000.0" step="10" onchange="state.wwt_flow_m3h=+this.value;refreshAll();"></div>
+    </div>
+    <div class="form-grid-3">
+      <div class="field"><label>Electricity Cost (€/kWh)</label><input type="number" id="elecCost" value="0.12" step="0.01" onchange="state.electricity_cost_eur_kwh=+this.value;refreshAll();"></div>
+      <div class="field"><label>Target Recycling Rate (%)</label><input type="number" id="recycleRate" value="70" min="0" max="95" step="5" onchange="state.target_recycle_pct=+this.value;refreshAll();"></div>
+      <div class="field"><label>Concentrate Flow (m³/h)</label><input type="number" id="concFlow" value="300.0" step="10" onchange="state.concentrate_flow_m3h=+this.value;refreshAll();"></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Process Water Balance</h2><span class="sec-sub">Default: Bremen Steel Works (Smart Water 4.0 case study)</span></div>
+    <div class="tbl-wrap"><table class="dt">
+      <thead><tr><th>Process Unit</th><th style="text-align:right">Inlet (m³/h)</th><th style="text-align:right">Outlet (m³/h)</th><th style="text-align:right">Net Loss (m³/h)</th></tr></thead>
+      <tbody id="processTbody"></tbody>
+    </table></div>
+    <div class="sec-head"><h2 class="sec-title">Contaminant Profile</h2><span class="sec-sub">Influent concentrations by process unit</span></div>
+    <div class="tbl-wrap"><table class="dt">
+      <thead><tr><th>Process</th><th>Contaminant</th><th style="text-align:right">Value</th><th>Unit</th></tr></thead>
+      <tbody id="contamTbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TREATMENT SOLUTIONS ════════════════════════════════════════════════ -->
+<div id="sec-treatment" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Treatment Solutions</h1><span class="topbar-meta">Select technology per stage · auto-recommendation available</span></div>
+  <div class="content">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
+      <button class="btn btn-primary" onclick="autoRecommend()">⚡ Auto-Recommend</button>
+      <span style="font-size:12px;color:var(--ink-3)">Based on highest contaminant concentrations in company data</span>
+    </div>
+    <div class="stage-grid" id="stageGrid"></div>
+    <div class="sec-head"><h2 class="sec-title">Treatment Chain — Contaminant Removal</h2><span class="sec-sub">Removal efficiencies per stage for key parameters</span></div>
+    <div class="tbl-wrap removal-wrap"><table class="dt" id="removalTable">
+      <thead><tr><th>Stage</th><th>Technology</th><th>TSS</th><th>Oil/Grease</th><th>Fe</th><th>Zn</th><th>COD</th><th>BOD</th><th>Tier</th><th style="text-align:right">CAPEX (€M)</th><th style="text-align:right">OPEX (€/yr M)</th></tr></thead>
+      <tbody id="removalTbody"></tbody>
+    </table></div>
+    <div class="sec-head"><h2 class="sec-title">Cost Summary</h2></div>
+    <div class="kpi-strip" id="txKpis">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="txCapex">—</div><div class="kpi-lbl">Total CAPEX Est.</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="txOpex">—</div><div class="kpi-lbl">Annual OPEX</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="txEnergy">—</div><div class="kpi-lbl">Energy (MWh/yr)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="txStages">—</div><div class="kpi-lbl">Active Stages</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EBITDA BRIDGE ══════════════════════════════════════════════════════ -->
+<div id="sec-ebitda" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">EBITDA Bridge — Water Value Creation</h1><span class="topbar-meta">Annual waterfall: water treatment investment → EBITDA improvement</span></div>
+  <div class="content">
+    <div class="form-grid">
+      <div class="field"><label>Target Recycling Rate (%)</label><input type="range" id="eRecycle" min="0" max="95" step="5" value="70" oninput="state.target_recycle_pct=+this.value;document.getElementById('eRecycleLbl').textContent=this.value+'%';renderEBITDA();"><span id="eRecycleLbl" style="font-size:12px;color:var(--ink-2);margin-top:2px;">70%</span></div>
+      <div class="field"><label>Fresh Water Rate (€/m³)</label><input type="number" id="eWcost" step="0.01" value="0.35" onchange="state.water_cost_eur_m3=+this.value;renderEBITDA();"></div>
+      <div class="field"><label>Discharge Rate (€/m³)</label><input type="number" id="eDcost" step="0.01" value="0.45" onchange="state.discharge_cost_eur_m3=+this.value;renderEBITDA();"></div>
+      <div class="field"><label>Regulatory Penalty Avoided (€M/yr)</label><input type="number" id="ePenalty" step="0.5" value="2.0" onchange="state.prod_penalty_m_eur=+this.value;renderEBITDA();"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-canvas-wrap" style="height:400px;"><canvas id="ebitdaCanvas"></canvas></div>
+    </div>
+    <div class="kpi-strip" id="ebitdaKpis">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--ink-2)"></div><div class="kpi-val" id="ek1">—</div><div class="kpi-lbl">Baseline Water Cost</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="ek2">—</div><div class="kpi-lbl">Total Annual Savings</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--red)"></div><div class="kpi-val" id="ek3">—</div><div class="kpi-lbl">Treatment OPEX</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="ek4">—</div><div class="kpi-lbl">Net EBITDA Improvement</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="ek5">—</div><div class="kpi-lbl">Simple Payback</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Savings Breakdown</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Item</th><th>Description</th><th style="text-align:right">€/yr</th><th style="text-align:right">% of Baseline</th></tr></thead><tbody id="ebitdaTbody"></tbody></table></div>
+    <div class="sec-head"><h2 class="sec-title">Material Recovery Detail</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Stream</th><th style="text-align:right">Quantity</th><th>Unit</th><th style="text-align:right">Revenue (€/yr)</th></tr></thead><tbody id="matRevTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ CAPEX / OPEX ═══════════════════════════════════════════════════════ -->
+<div id="sec-capex" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">CapEx / OpEx — Investment Planning</h1><span class="topbar-meta">Multi-year plan · NPV · IRR · payback</span></div>
+  <div class="content">
+    <div class="form-grid">
+      <div class="field"><label>Planning Horizon (years)</label>
+        <select id="capHorizon" onchange="state.time_horizon_yr=+this.value;renderCapex();">
+          <option value="3">3 years</option><option value="5" selected>5 years</option><option value="10">10 years</option>
+        </select>
+      </div>
+      <div class="field"><label>CAPEX Profile</label>
+        <select id="capProfile" onchange="state.capex_profile=this.value;renderCapex();">
+          <option value="front-loaded" selected>Front-loaded</option><option value="even">Even</option><option value="back-loaded">Back-loaded</option>
+        </select>
+      </div>
+      <div class="field"><label>Discount Rate (%)</label><input type="number" id="capDiscount" value="8.0" step="0.5" min="0" max="30" onchange="state.discount_rate_pct=+this.value;renderCapex();"></div>
+      <div class="field"><label>Target Recycling Rate (%)</label><input type="number" id="capRecycle" value="70" step="5" min="0" max="95" onchange="state.target_recycle_pct=+this.value;renderCapex();"></div>
+    </div>
+    <div class="kpi-strip" id="capexKpis">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="ck1">—</div><div class="kpi-lbl">Total CAPEX</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="ck2">—</div><div class="kpi-lbl">NPV (20yr)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="ck3">—</div><div class="kpi-lbl">IRR</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="ck4">—</div><div class="kpi-lbl">Simple Payback</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">CAPEX Phasing</h2><span class="sec-sub" id="capexPhaseSub"></span></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Year</th><th style="text-align:right">CAPEX (€M)</th><th style="text-align:right">Cumulative (€M)</th><th style="text-align:right">Treatment OPEX (€M)</th><th style="text-align:right">Annual Benefit (€M)</th><th style="text-align:right">Net Cash (€M)</th></tr></thead><tbody id="capexPhaseTbody"></tbody></table></div>
+    <div class="sec-head"><h2 class="sec-title">Cumulative Net Cash Flow</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:320px;"><canvas id="cashflowCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Annual CAPEX / OPEX / Benefit</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:280px;"><canvas id="annualCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">NPV Sensitivity vs Discount Rate</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="npvSensCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Optimisation — Deployment Priority</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Stage</th><th>Technology</th><th>Tier</th><th style="text-align:right">CAPEX (€M)</th><th style="text-align:right">Stage NPV (€M)</th><th style="text-align:right">NPV/CAPEX (x)</th><th>Priority</th></tr></thead><tbody id="optTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ EEA WATER STRESS ═══════════════════════════════════════════════════ -->
+<div id="sec-eea" class="section hidden">
+  <div class="topbar">
+    <h1 class="pg-title">European Water Stress — EEA Overview</h1>
+    <span class="topbar-meta">Source: <a href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111</a> · WEI+ · Latest available</span>
+  </div>
+  <div class="content">
     <div class="kpi-strip">
-      <div class="kpi">
-        <div class="kpi-stripe" style="background:var(--s1)"></div>
-        <div class="kpi-value">8<span class="kpi-unit"> countries</span></div>
-        <div class="kpi-label">Above 20% water scarcity threshold</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-stripe" style="background:var(--s3)"></div>
-        <div class="kpi-value">11<span class="kpi-unit">%</span></div>
-        <div class="kpi-label">EU population in water-scarce areas</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-stripe" style="background:var(--s4)"></div>
-        <div class="kpi-value">−18<span class="kpi-unit">%</span></div>
-        <div class="kpi-label">Freshwater abstractions since 2000</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-stripe" style="background:var(--accent)"></div>
-        <div class="kpi-value">12<span class="kpi-unit">%</span></div>
-        <div class="kpi-label">EU average WEI+ (renewable resources used)</div>
-      </div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s1)"></div><div class="kpi-val">8<span class="kpi-unit"> countries</span></div><div class="kpi-lbl">Above 20% water scarcity threshold</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val">11<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU population in water-scarce areas</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s4)"></div><div class="kpi-val">−18<span class="kpi-unit">%</span></div><div class="kpi-lbl">Freshwater abstractions since 2000</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val">12<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU average WEI+</div></div>
     </div>
-
-    <!-- WEI Chart -->
-    <div class="section-head">
-      <h2 class="section-title">Water Exploitation Index Plus by Country</h2>
-      <span class="section-sub">WEI+ = annual abstractions ÷ long-term renewable freshwater. Threshold: 20%</span>
-    </div>
-    <div class="wei-chart">
-      <div id="weiChart"></div>
+    <div class="sec-head"><h2 class="sec-title">Water Exploitation Index Plus by Country</h2><span class="sec-sub">WEI+ = annual abstractions ÷ long-term renewable freshwater · Threshold: 20%</span></div>
+    <div class="wei-chart"><div id="weiChart"></div>
       <div class="wei-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--s1)"></div>Severe (&gt;40%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--s2)"></div>High (20–40%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--s3)"></div>Moderate (15–20%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--s4)"></div>Low (5–15%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--s5)"></div>Minimal (&lt;5%)</div>
-        <div class="legend-item" style="margin-left:auto">
-          <div style="width:1px;height:12px;background:var(--ink-3);opacity:0.5"></div>
-          20% scarcity threshold
-        </div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s1)"></div>Severe (&gt;40%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s2)"></div>High (20–40%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s3)"></div>Moderate (15–20%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s4)"></div>Low (5–15%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s5)"></div>Minimal (&lt;5%)</div>
       </div>
     </div>
-
-    <!-- Country Table + Sectors -->
-    <div class="section-head">
-      <h2 class="section-title">Country Detail</h2>
-      <span class="section-sub">Sorted by WEI+ descending · Mediterranean basin disproportionately affected</span>
-    </div>
-
+    <div class="sec-head"><h2 class="sec-title">Country Detail</h2><span class="sec-sub">Sorted by WEI+ descending</span></div>
     <div class="two-col">
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th style="text-align:right">WEI+</th>
-              <th>Stress Level</th>
-              <th>Primary Pressure</th>
-            </tr>
-          </thead>
-          <tbody id="countryTableBody"></tbody>
-        </table>
-      </div>
-
+      <div class="tbl-wrap"><table class="dt"><thead><tr><th>Country</th><th style="text-align:right">WEI+</th><th>Stress Level</th><th>Primary Pressure</th></tr></thead><tbody id="eeaTbody"></tbody></table></div>
       <div class="sector-panel">
         <div class="sector-title">Water Use by Sector — Europe</div>
         <canvas id="sectorCanvas" width="264" height="180"></canvas>
         <div class="sector-list" id="sectorList"></div>
-        <p style="font-size:10px;color:var(--ink-3);margin-top:14px;line-height:1.5">
-          Energy dominates water use through cooling in thermal power plants.
-          Agriculture drives stress in southern regions.
-          Source: EEA Waterbase / Eurostat.
-        </p>
+        <p style="font-size:10px;color:var(--ink-3);margin-top:14px;line-height:1.5">Energy dominates via thermal power cooling. Agriculture drives stress in southern regions. Source: EEA Waterbase / Eurostat.</p>
       </div>
     </div>
+    <div class="src-footer">
+      <span class="src-label">Sources</span>
+      <a class="src-link" href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111 — Freshwater Resources in Europe</a>
+      <a class="src-link" href="https://water.europa.eu/freshwater" target="_blank" rel="noopener">EEA WISE</a>
+    </div>
+  </div>
+</div>
 
-    <!-- Source -->
-    <div class="source-footer">
-      <span class="source-label">Data Sources</span>
-      <a class="source-link" href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA — Use of Freshwater Resources in Europe (IND-111)</a>
-      <a class="source-link" href="https://water.europa.eu/freshwater" target="_blank" rel="noopener">EEA Water Information System for Europe (WISE)</a>
-      <a class="source-link" href="https://www.eea.europa.eu/publications/water-resources-across-europe" target="_blank" rel="noopener">EEA Water Resources Report</a>
+<!-- ═══ PROCESS KINETICS (ASM1) ════════════════════════════════════════════ -->
+<div id="sec-kinetics" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Process Kinetics — ASM1 Steady-State</h1><span class="topbar-meta">Activated Sludge Model No. 1 · IWA · Bremen Steel Works demo data</span></div>
+  <div class="content">
+    <div class="info-banner">Steady-state ASM1 implementation based on Henze et al. (2000). Parameters calibrated for industrial wastewater treatment. All values calculated in real-time from configured company data.</div>
+    <div class="sec-head"><h2 class="sec-title">Model Parameters</h2></div>
+    <div class="form-grid">
+      <div class="field"><label>Sludge Retention Time, θ<sub>c</sub> (days)</label><input type="range" id="asmSRT" min="3" max="30" step="1" value="12" oninput="document.getElementById('asmSRTLbl').textContent=this.value+' d';renderKinetics();"><span id="asmSRTLbl" style="font-size:12px;color:var(--ink-2)">12 d</span></div>
+      <div class="field"><label>Influent COD, S₀ (mg/L)</label><input type="number" id="asmCOD" value="500" step="10" onchange="renderKinetics();"></div>
+      <div class="field"><label>Influent TKN (mg/L)</label><input type="number" id="asmTKN" value="40" step="5" onchange="renderKinetics();"></div>
+      <div class="field"><label>Temperature (°C)</label><input type="number" id="asmTemp" value="20" min="10" max="35" step="1" onchange="renderKinetics();"></div>
+    </div>
+    <div class="kpi-strip" id="asmKpis">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="ak1">—</div><div class="kpi-lbl">Effluent COD</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="ak2">—</div><div class="kpi-lbl">Sludge Production</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="ak3">—</div><div class="kpi-lbl">Oxygen Demand</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="ak4">—</div><div class="kpi-lbl">Sludge Volume</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Effluent COD vs Sludge Age (SRT)</h2><span class="sec-sub">Minimum SRT for stable operation indicated by dashed line</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:280px;"><canvas id="asmSRTCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Kinetic Parameter Summary</h2></div>
+    <div class="tbl-wrap"><table class="dt" id="asmParamTable">
+      <thead><tr><th>Parameter</th><th>Symbol</th><th style="text-align:right">Value</th><th>Unit</th><th>Source</th></tr></thead>
+      <tbody id="asmParamTbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ CARBON FOOTPRINT ════════════════════════════════════════════════════ -->
+<div id="sec-carbon" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Carbon Footprint — Scope 1 / 2 / 3</h1><span class="topbar-meta">IPCC Tier 2 methodology · annual GHG emissions · tCO₂e/yr</span></div>
+  <div class="content">
+    <div class="info-banner">Carbon accounting follows IPCC (2019) methodology for WWTP: direct process emissions (Scope 1), purchased electricity (Scope 2), and value-chain activities (Scope 3). Treatment configuration affects all three scopes.</div>
+    <div class="form-grid-3">
+      <div class="field"><label>Grid Emission Factor (kg CO₂e/kWh)</label><input type="number" id="cfGrid" value="0.295" step="0.01" onchange="renderCarbon();"></div>
+      <div class="field"><label>TKN in Influent (mg/L)</label><input type="number" id="cfTKN" value="40" step="5" onchange="renderCarbon();"></div>
+      <div class="field"><label>Sludge Disposal (kg CO₂e/kg DS)</label><input type="number" id="cfSludge" value="0.36" step="0.01" onchange="renderCarbon();"></div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--red)"></div><div class="kpi-val" id="cf1">—</div><div class="kpi-lbl">Scope 1 — Direct</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="cf2">—</div><div class="kpi-lbl">Scope 2 — Energy</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="cf3">—</div><div class="kpi-lbl">Scope 3 — Value Chain</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--ink-2)"></div><div class="kpi-val" id="cf4">—</div><div class="kpi-lbl">Total GHG</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Emissions by Scope</h2></div>
+    <div class="two-col">
+      <div class="tbl-wrap"><table class="dt"><thead><tr><th>Emission Source</th><th>Scope</th><th style="text-align:right">tCO₂e/yr</th><th style="text-align:right">%</th></tr></thead><tbody id="cfTbody"></tbody></table></div>
+      <div class="chart-wrap" style="padding:0;overflow:hidden;"><div class="chart-canvas-wrap" style="height:300px;"><canvas id="cfDonut"></canvas></div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Emissions vs Treatment Technology</h2><span class="sec-sub">Impact of technology selection on each scope</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="cfBarCanvas"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══ FLOOD & RAINFALL ════════════════════════════════════════════════════ -->
+<div id="sec-flood" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Flood &amp; Rainfall Risk</h1><span class="topbar-meta">Open-Meteo GloFAS · Bremen, Germany (53.08°N 8.80°E)</span></div>
+  <div class="content">
+    <div class="info-banner" id="floodBanner">Fetching live flood and rainfall data from Open-Meteo GloFAS API for Bremen site location…</div>
+    <div class="form-grid-3">
+      <div class="field"><label>Site Latitude</label><input type="number" id="floodLat" value="53.08" step="0.01" onchange="fetchFloodData();"></div>
+      <div class="field"><label>Site Longitude</label><input type="number" id="floodLon" value="8.80" step="0.01" onchange="fetchFloodData();"></div>
+      <div class="field"><label>Design Flow Threshold (m³/s)</label><input type="number" id="floodThresh" value="350" step="10" onchange="renderFloodCharts();"></div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="fk1">—</div><div class="kpi-lbl">Max Discharge (m³/s)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="fk2">—</div><div class="kpi-lbl">Avg Precipitation (mm/d)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--red)"></div><div class="kpi-val" id="fk3">—</div><div class="kpi-lbl">High-risk Days</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="fk4">—</div><div class="kpi-lbl">Data Period</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">River Discharge Forecast — Weser at Bremen</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="floodCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Daily Precipitation (mm)</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:220px;"><canvas id="rainCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Risk Assessment</h2></div>
+    <div id="floodRiskTable"></div>
+  </div>
+</div>
+
+<!-- ═══ SITE INTELLIGENCE ══════════════════════════════════════════════════ -->
+<div id="sec-site" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Site Intelligence — Bremen Steel Works</h1><span class="topbar-meta">Interactive site map · process unit locations · water infrastructure</span></div>
+  <div class="content">
+    <div class="form-grid-3">
+      <div class="field"><label>Company Name</label><input type="text" id="siteCompName" value="Bremen Steel Works" oninput="updateSiteInfo();"></div>
+      <div class="field"><label>Latitude</label><input type="number" id="siteLat" value="53.0795" step="0.001" onchange="updateSiteMap();"></div>
+      <div class="field"><label>Longitude</label><input type="number" id="siteLon" value="8.7815" step="0.001" onchange="updateSiteMap();"></div>
+    </div>
+    <div style="height:440px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:24px;" id="siteMap"></div>
+    <div class="sec-head"><h2 class="sec-title">Process Unit Locations</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Unit</th><th>Function</th><th style="text-align:right">Inlet (m³/h)</th><th style="text-align:right">Outlet (m³/h)</th><th>Status</th></tr></thead>
+    <tbody id="siteUnitTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO COMPARISON ════════════════════════════════════════════════ -->
+<div id="sec-compare" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Scenario Comparison</h1><span class="topbar-meta">Conservative vs Standard vs Advanced · Bremen Steel Works</span></div>
+  <div class="content">
+    <div class="info-banner">Three pre-configured treatment scenarios are compared below using Bremen Steel Works data. Each scenario uses the same site parameters but different technology selections and recycling targets.</div>
+    <div class="kpi-strip" id="compareKpis"></div>
+    <div class="sec-head"><h2 class="sec-title">CAPEX / OPEX / EBITDA Comparison</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:300px;"><canvas id="compareBarCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Full Scenario Detail</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Metric</th><th style="text-align:right">Conservative</th><th style="text-align:right">Standard</th><th style="text-align:right">Advanced</th></tr></thead><tbody id="compareTbody"></tbody></table></div>
+    <div class="sec-head"><h2 class="sec-title">Technology Selection per Scenario</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Treatment Stage</th><th>Conservative</th><th>Standard</th><th>Advanced</th></tr></thead><tbody id="compareTechTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ RESULTS & TRENDS ═══════════════════════════════════════════════════ -->
+<div id="sec-trends" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Results &amp; Trends</h1><span class="topbar-meta">Saved scenarios · historical analysis · time-series</span></div>
+  <div class="content">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
+      <button class="btn btn-primary" onclick="saveScenario()">💾 Save Current Scenario</button>
+      <input type="text" id="scenarioName" placeholder="Scenario name (optional)" style="padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:13px;width:240px;">
+      <button class="btn btn-ghost" onclick="loadTrends()">↻ Refresh</button>
+    </div>
+    <div id="trendsBanner" class="info-banner" style="display:none"></div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="tr1">—</div><div class="kpi-lbl">Scenarios Saved</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="tr2">—</div><div class="kpi-lbl">Best EBITDA</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="tr3">—</div><div class="kpi-lbl">Lowest CAPEX</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="tr4">—</div><div class="kpi-lbl">Lowest Carbon</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">EBITDA Improvement Over Time</h2><span class="sec-sub">Each point is a saved scenario — drag to zoom</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:240px;"><canvas id="trendEBITDACanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">CAPEX Estimate Over Time</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:220px;"><canvas id="trendCAPEXCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Carbon Footprint Over Time</h2></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:220px;"><canvas id="trendCarbonCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Saved Scenarios</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Date</th><th>Name</th><th style="text-align:right">EBITDA (€M/yr)</th><th style="text-align:right">CAPEX (€M)</th><th style="text-align:right">Carbon (tCO₂e)</th><th style="text-align:right">Recycling</th><th>Technologies</th></tr></thead><tbody id="trendsTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ SCADA ANALYSIS ════════════════════════════════════════════════════════ -->
+<div id="sec-scada" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">SCADA Data Analysis</h1><span class="topbar-meta">Live sensor data · RO performance · Energy monitoring · Conductivity trends</span></div>
+  <div class="content">
+    <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;">
+      <div class="field" style="margin:0;min-width:160px;">
+        <label>Select Month</label>
+        <select id="scadaMonth" onchange="renderSCADA()" style="padding:8px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:13px;width:100%;font-family:inherit;">
+          <option value="apr25">April 2025 (demo)</option>
+          <option value="may25" selected>May 2025 (live)</option>
+          <option value="jun25">June 2025 (demo)</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost" onclick="downloadSCADATemplate()">⬇ Download Import Template (.csv)</button>
+      <label class="btn btn-ghost" style="cursor:pointer;margin:0;">
+        ⬆ Import SCADA CSV
+        <input type="file" id="scadaFile" accept=".csv" style="display:none" onchange="importSCADACSV(this)">
+      </label>
+      <span id="scadaImportStatus" style="font-size:12px;color:var(--ink-3);align-self:center;"></span>
     </div>
 
-  </div><!-- /content -->
+    <div class="kpi-strip" id="scadaKpis"></div>
+
+    <!-- Volume -->
+    <div class="sec-head"><h2 class="sec-title">Daily Treated Water Volume — FQ195 (m³/d) &amp; Flow Rate FI123 (m³/h)</h2><span class="sec-sub">Source: Decimal pivot volume daily · Fiscal flowmeter cumulative increment</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="scadaVolCanvas"></canvas></div></div>
+
+    <!-- Power -->
+    <div class="sec-head" style="margin-top:28px;"><h2 class="sec-title">Daily Energy Consumption — Unit (U_W kWh) &amp; Domestic (D_W kWh)</h2><span class="sec-sub">Source: Decimal pivot power · Max−Min cumulative energy meter per day</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:240px;"><canvas id="scadaPwrCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Monthly Energy Trend</h2><span class="sec-sub">Total kWh per month — select all months to compare</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:200px;"><canvas id="scadaPwrTrendCanvas"></canvas></div></div>
+
+    <!-- Recovery -->
+    <div class="sec-head"><h2 class="sec-title">RO Recovery Rates — rc180 &amp; rc280 (%)</h2><span class="sec-sub">Source: Decimal pivot recovery · Average of operating hours only (zeros excluded)</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:240px;"><canvas id="scadaRecCanvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Process Unit Operational Effectiveness</h2><span class="sec-sub">RO units from SCADA · other process steps from design specifications</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:200px;"><canvas id="scadaEffCanvas"></canvas></div></div>
+
+    <!-- Conductivity -->
+    <div class="sec-head"><h2 class="sec-title">Graph 1 — Operating Hours (OP_Ro1) &amp; NI123 Feed Conductivity (mS/cm)</h2><span class="sec-sub">Source: Decimal pivot conductivity · RO1 cumulative run hours + inlet water quality</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:240px;"><canvas id="scadaCond123Canvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Graph 2 — NI180 Permeate Conductivity (µS/cm)</h2><span class="sec-sub">RO-180 unit permeate quality · lower = better rejection</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:220px;"><canvas id="scadaCond180Canvas"></canvas></div></div>
+    <div class="sec-head"><h2 class="sec-title">Graph 3 — NI280 Permeate Conductivity (µS/cm)</h2><span class="sec-sub">RO-280 unit permeate quality · lower = better rejection</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:220px;"><canvas id="scadaCond280Canvas"></canvas></div></div>
+
+    <div class="sec-head"><h2 class="sec-title">Raw Data Table</h2></div>
+    <div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">
+      <table class="dt" id="scadaTable"><thead><tr>
+        <th>Date</th><th style="text-align:right">Vol (m³/d)</th><th style="text-align:right">Flow (m³/h)</th>
+        <th style="text-align:right">Unit (kWh)</th><th style="text-align:right">Domestic (kWh)</th>
+        <th style="text-align:right">rc180 (%)</th><th style="text-align:right">rc280 (%)</th>
+        <th style="text-align:right">Op.h (h)</th><th style="text-align:right">NI123 (mS/cm)</th>
+        <th style="text-align:right">NI180 (µS/cm)</th><th style="text-align:right">NI280 (µS/cm)</th>
+      </tr></thead><tbody id="scadaTbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SANKEY ════════════════════════════════════════════════════════════════ -->
+<div id="sec-sankey" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Water Flow — Sankey Diagram</h1><span class="topbar-meta">Process-to-process flow volumes · m³/h</span></div>
+  <div class="content">
+    <div class="sec-head"><h2 class="sec-title">Site-Wide Water Balance</h2><span class="sec-sub">Flow width proportional to m³/h · hover nodes for detail</span></div>
+    <div class="chart-wrap" style="padding:24px 0;">
+      <canvas id="sankeyCanvas" style="width:100%;display:block;"></canvas>
+    </div>
+    <div class="kpi-strip" id="sankeyKpis" style="margin-top:16px;"></div>
+    <div class="sec-head" style="margin-top:24px;"><h2 class="sec-title">Process Mass Balance</h2><span class="sec-sub">IWA standard water audit framework</span></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Flow Stream</th><th style="text-align:right">Flow (m³/h)</th><th style="text-align:right">Flow (ML/d)</th><th style="text-align:right">% of Intake</th><th>Category</th></tr></thead><tbody id="sankeyTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ LEAK DETECTION ════════════════════════════════════════════════════════ -->
+<div id="sec-leakdetect" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Leak Detection &amp; Non-Revenue Water</h1><span class="topbar-meta">IWA methodology · FAVAD model · Financial impact</span></div>
+  <div class="content">
+    <div class="info-banner">Calibrated using Hazen-Williams hydraulic model and IWA Water Loss Task Force methodology (UARL / ILI framework). PlutoCalc-aligned pressure-dependent leakage via FAVAD equations.</div>
+    <div class="sec-head"><h2 class="sec-title">Network Parameters</h2></div>
+    <div class="form-grid">
+      <div class="field"><label>Mains Length, L<sub>m</sub> (km)</label><input type="number" id="ldLm" value="8.5" step="0.1" onchange="renderLeakDetect();"></div>
+      <div class="field"><label>Service Connections, N<sub>c</sub></label><input type="number" id="ldNc" value="45" step="1" onchange="renderLeakDetect();"></div>
+      <div class="field"><label>Private Pipe Length, L<sub>p</sub> (km)</label><input type="number" id="ldLp" value="2.1" step="0.1" onchange="renderLeakDetect();"></div>
+      <div class="field"><label>Average Pressure, P (bar)</label><input type="number" id="ldP" value="4.2" step="0.1" onchange="renderLeakDetect();"></div>
+      <div class="field"><label>Pipe Age (years)</label><input type="number" id="ldAge" value="18" step="1" onchange="renderLeakDetect();"></div>
+      <div class="field"><label>Detection Programme Cost (€/yr)</label><input type="number" id="ldProgramCost" value="85000" step="5000" onchange="renderLeakDetect();"></div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--red)"></div><div class="kpi-val" id="ldk1">—</div><div class="kpi-lbl">NRW (Non-Revenue Water)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="ldk2">—</div><div class="kpi-lbl">CARL (Real Losses)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="ldk3">—</div><div class="kpi-lbl">UARL (Unavoidable)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--green)"></div><div class="kpi-val" id="ldk4">—</div><div class="kpi-lbl">ILI (Leakage Index)</div></div>
+    </div>
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px;">
+      <div>
+        <div class="sec-head"><h2 class="sec-title">FAVAD Pressure–Leakage Curve</h2><span class="sec-sub">Fixed &amp; Variable Area Discharges model</span></div>
+        <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="favadCanvas"></canvas></div></div>
+      </div>
+      <div>
+        <div class="sec-head"><h2 class="sec-title">Financial Impact &amp; Payback</h2><span class="sec-sub">Cost of undetected leakage vs. detection investment</span></div>
+        <div class="chart-wrap"><div class="chart-canvas-wrap" style="height:260px;"><canvas id="leakFinCanvas"></canvas></div></div>
+      </div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Hazen-Williams Pipe Calibration</h2><span class="sec-sub">Roughness coefficient C by pipe age — calibrated to site conditions</span></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Parameter</th><th>Symbol</th><th style="text-align:right">Value</th><th>Unit</th><th>Method</th></tr></thead><tbody id="ldCalibTbody"></tbody></table></div>
+    <div class="sec-head"><h2 class="sec-title">Leak Detection ROI</h2></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Metric</th><th style="text-align:right">Value</th><th>Notes</th></tr></thead><tbody id="ldROITbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ HEAT MAP ══════════════════════════════════════════════════════════════ -->
+<div id="sec-heatmap" class="section hidden">
+  <div class="topbar"><h1 class="pg-title">Site Stress Heat Map</h1><span class="topbar-meta">Topographic · surface water · rainfall · groundwater exposure</span></div>
+  <div class="content">
+    <div class="info-banner" id="heatBanner">Loading stress layers from live climate and hydrological data sources…</div>
+    <div class="form-grid" style="margin-bottom:16px;">
+      <div class="field"><label>Site Latitude</label><input type="number" id="hmLat" value="53.0795" step="0.001" onchange="renderHeatMap();"></div>
+      <div class="field"><label>Site Longitude</label><input type="number" id="hmLon" value="8.7815" step="0.001" onchange="renderHeatMap();"></div>
+      <div class="field"><label>Grid Radius (km)</label><input type="number" id="hmRadius" value="2.0" step="0.5" onchange="renderHeatMap();"></div>
+      <div class="field" style="align-self:end;">
+        <button class="btn btn-primary" onclick="renderHeatMap()">↻ Refresh Stress Layers</button>
+      </div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--red)"></div><div class="kpi-val" id="hmk1">—</div><div class="kpi-lbl">Flood Exposure Score</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="hmk2">—</div><div class="kpi-lbl">Rainfall Intensity Score</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="hmk3">—</div><div class="kpi-lbl">Water Scarcity Score</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="hmk4">—</div><div class="kpi-lbl">Composite Stress Level</div></div>
+    </div>
+    <div style="height:480px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:20px;" id="heatMap"></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-3);margin-bottom:20px;">
+      <strong style="color:var(--ink)">Stress Legend:</strong>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;background:#2ea44f;display:inline-block;opacity:0.7"></span> Low (0–25%)</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;background:#f39c12;display:inline-block;opacity:0.7"></span> Moderate (25–50%)</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;background:#e67e22;display:inline-block;opacity:0.7"></span> High (50–75%)</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:14px;border-radius:50%;background:#e74c3c;display:inline-block;opacity:0.7"></span> Extreme (&gt;75%)</span>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Stress Factor Breakdown</h2><span class="sec-sub">Per zone — composite of flood risk, rainfall, water scarcity, groundwater depth</span></div>
+    <div class="tbl-wrap"><table class="dt"><thead><tr><th>Zone / Location</th><th style="text-align:right">Flood</th><th style="text-align:right">Rainfall</th><th style="text-align:right">Scarcity</th><th style="text-align:right">Composite</th><th>Risk Level</th></tr></thead><tbody id="heatTbody"></tbody></table></div>
+  </div>
+</div>
+
 </div><!-- /main -->
-
-<script>
-/* ── Data ───────────────────────────────────────────────── */
-const WEI_DATA = [
-  { country: 'Cyprus',         wei: 42.7, level: 'Severe'   , pressure: 'Tourism, irrigation'     },
-  { country: 'Malta',          wei: 35.2, level: 'Severe'   , pressure: 'Groundwater depletion'   },
-  { country: 'Spain',          wei: 32.1, level: 'High'     , pressure: 'Irrigated agriculture'   },
-  { country: 'Belgium',        wei: 29.6, level: 'High'     , pressure: 'Industrial demand'        },
-  { country: 'Italy',          wei: 25.3, level: 'High'     , pressure: 'Agriculture, energy'      },
-  { country: 'Bulgaria',       wei: 22.1, level: 'High'     , pressure: 'Energy cooling'           },
-  { country: 'France',         wei: 21.7, level: 'High'     , pressure: 'Nuclear cooling'          },
-  { country: 'Germany',        wei: 20.4, level: 'High'     , pressure: 'Industry, energy'         },
-  { country: 'Poland',         wei: 19.8, level: 'Moderate' , pressure: 'Coal energy cooling'      },
-  { country: 'Romania',        wei: 19.3, level: 'Moderate' , pressure: 'Irrigation, energy'       },
-  { country: 'Greece',         wei: 18.1, level: 'Moderate' , pressure: 'Tourism, agriculture'     },
-  { country: 'Portugal',       wei: 16.9, level: 'Moderate' , pressure: 'Irrigated agriculture'    },
-  { country: 'Czech Republic', wei: 14.7, level: 'Low'      , pressure: 'Industry'                 },
-  { country: 'Hungary',        wei: 13.8, level: 'Low'      , pressure: 'Agriculture'               },
-  { country: 'Netherlands',    wei: 10.1, level: 'Low'      , pressure: 'Industry, horticulture'   },
-  { country: 'Austria',        wei:  8.4, level: 'Low'      , pressure: 'Energy cooling'           },
-  { country: 'Ireland',        wei:  4.2, level: 'Minimal'  , pressure: 'Public supply'            },
-  { country: 'Sweden',         wei:  3.7, level: 'Minimal'  , pressure: 'Energy sector'            },
-  { country: 'Finland',        wei:  2.1, level: 'Minimal'  , pressure: 'Pulp & paper industry'    },
-  { country: 'Norway',         wei:  1.8, level: 'Minimal'  , pressure: 'Hydropower losses'        },
-];
-
-const SECTORS = [
-  { label: 'Energy',          pct: 44, color: '#1D7A8C' },
-  { label: 'Agriculture',     pct: 33, color: '#3A8A5E' },
-  { label: 'Public Supply',   pct: 15, color: '#C9A820' },
-  { label: 'Industry',        pct:  8, color: '#D4762A' },
-];
-
-const LEVEL_COLOR = {
-  Severe:   '#C5402E',
-  High:     '#D4762A',
-  Moderate: '#C9A820',
-  Low:      '#3A8A5E',
-  Minimal:  '#1D7A8C',
-};
-const LEVEL_BG = {
-  Severe:   'rgba(197,64,46,0.12)',
-  High:     'rgba(212,118,42,0.12)',
-  Moderate: 'rgba(201,168,32,0.12)',
-  Low:      'rgba(58,138,94,0.12)',
-  Minimal:  'rgba(29,122,140,0.12)',
-};
-
-/* ── Build WEI chart ────────────────────────────────────── */
-function buildWeiChart() {
-  const wrap = document.getElementById('weiChart');
-  const maxWei = 50;
-  const thresholdPct = (20 / maxWei) * 100;
-  WEI_DATA.forEach(d => {
-    const row = document.createElement('div');
-    row.className = 'wei-row';
-    const barPct = (d.wei / maxWei) * 100;
-    const col = LEVEL_COLOR[d.level];
-    row.innerHTML = `
-      <span class="wei-country">${d.country}</span>
-      <div class="wei-bar-wrap">
-        <div class="wei-threshold" style="left:${thresholdPct}%"></div>
-        <div class="wei-bar" style="width:${barPct}%;background:${col}"></div>
-      </div>
-      <span class="wei-val">${d.wei.toFixed(1)}%</span>
-    `;
-    wrap.appendChild(row);
-  });
-}
-
-/* ── Build country table ────────────────────────────────── */
-function buildTable() {
-  const tbody = document.getElementById('countryTableBody');
-  WEI_DATA.forEach(d => {
-    const tr = document.createElement('tr');
-    const col = LEVEL_COLOR[d.level];
-    const bg  = LEVEL_BG[d.level];
-    tr.innerHTML = `
-      <td>${d.country}</td>
-      <td class="td-num">${d.wei.toFixed(1)}%</td>
-      <td><span class="stress-chip" style="color:${col};background:${bg}">${d.level}</span></td>
-      <td style="color:var(--ink-2);font-size:11.5px">${d.pressure}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-/* ── Sector donut ───────────────────────────────────────── */
-function drawDonut() {
-  const canvas = document.getElementById('sectorCanvas');
-  const ctx = canvas.getContext('2d');
-  const cx = canvas.width / 2, cy = canvas.height / 2;
-  const r = 70, hole = 44;
-  let start = -Math.PI / 2;
-  SECTORS.forEach(s => {
-    const angle = (s.pct / 100) * 2 * Math.PI;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, start + angle);
-    ctx.closePath();
-    ctx.fillStyle = s.color;
-    ctx.fill();
-    start += angle;
-  });
-  // hole
-  ctx.beginPath();
-  ctx.arc(cx, cy, hole, 0, 2 * Math.PI);
-  const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff';
-  ctx.fillStyle = bg;
-  ctx.fill();
-  // center label
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0D1E2D';
-  ctx.font = 'bold 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('EU', cx, cy - 8);
-  ctx.font = '10px system-ui';
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink-3').trim() || '#6A8598';
-  ctx.fillText('by sector', cx, cy + 10);
-
-  const list = document.getElementById('sectorList');
-  SECTORS.forEach(s => {
-    const row = document.createElement('div');
-    row.className = 'sector-row';
-    row.innerHTML = `
-      <div class="sector-dot" style="background:${s.color}"></div>
-      <span>${s.label}</span>
-      <span class="sector-pct">${s.pct}%</span>
-    `;
-    list.appendChild(row);
-  });
-}
-
-/* ── Session check ──────────────────────────────────────── */
-function signOut() {
-  fetch('/api/neptune/logout', { method: 'POST' })
-    .finally(() => { window.location.href = '/'; });
-}
-
-async function checkSession() {
-  try {
-    const r = await fetch('/api/neptune/session');
-    const data = await r.json();
-    if (!data.authenticated) {
-      window.location.href = '/';
-      return;
-    }
-    // Show user info
-    if (data.email) {
-      const short = data.email.split('@')[0];
-      document.getElementById('userEmail').textContent = data.email;
-      document.getElementById('userAvatar').textContent = short[0].toUpperCase();
-    }
-    document.getElementById('authOverlay').style.display = 'none';
-  } catch {
-    window.location.href = '/';
-  }
-}
-
-/* ── Init ───────────────────────────────────────────────── */
-checkSession();
-buildWeiChart();
-buildTable();
-drawDonut();
-</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="/neptune-app.js"></script>
 </body>
 </html>

@@ -14,6 +14,21 @@
       "src": "^/$",
       "has": [{ "type": "host", "value": "neptune.atipicgroup.com" }],
       "dest": "/neptune.html"
+    },
+    {
+      "src": "^/app$",
+      "has": [{ "type": "host", "value": "christobal.atipicgroup.com" }],
+      "dest": "/christobal-app.html"
+    },
+    {
+      "src": "^/api/(.*)",
+      "has": [{ "type": "host", "value": "christobal.atipicgroup.com" }],
+      "dest": "/api/$1"
+    },
+    {
+      "src": "^/$",
+      "has": [{ "type": "host", "value": "christobal.atipicgroup.com" }],
+      "dest": "/christobal.html"
     }
   ]
 }
