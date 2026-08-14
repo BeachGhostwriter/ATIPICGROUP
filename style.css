@@ -352,9 +352,9 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
 .hero-inner { max-width: 1320px; margin: 0 auto; padding: 10rem 2rem 5.5rem; position: relative; z-index: 1; display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 3rem; align-items: center; }
 .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.42rem 1.1rem; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28); border-radius: 50px; font-size: 0.84rem; font-weight: 700; color: #fff; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.7rem; }
 .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--blue-300); border-radius: 50%; }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(3.3rem, 6vw, 5.45rem); font-weight: 700; color: #fff; line-height: 1.04; margin-bottom: 1.15rem; letter-spacing: -0.02em; max-width: 9.5ch; }
-.hero h1 em { color: #fff; font-style: normal; }
-.hero-sub { font-size: 1.28rem; color: rgba(255,255,255,0.95); max-width: 540px; margin-bottom: 2.5rem; line-height: 1.72; font-weight: 400; }
+.hero-left h1 { font-family: 'Playfair Display', serif; font-size: clamp(3.3rem, 6vw, 5.45rem); font-weight: 700; color: #fff; line-height: 1.04; margin-bottom: 1.15rem; letter-spacing: -0.02em; max-width: 9.5ch; }
+.hero-left h1 em { color: #fff; font-weight: 700; font-style: normal; }
+.hero-sub { font-size: 1.28rem; color: #fff; max-width: 540px; margin-bottom: 2.5rem; line-height: 1.72; font-weight: 400; }
 .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
 .hero-btns .btn { font-size: 0.98rem; padding: 0.95rem 2.1rem; }
 .hero-right { min-width: 0; }
@@ -502,7 +502,7 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
   .hero-stats { display: grid; grid-template-columns: repeat(2,1fr); width: 100%; }
   .hstat { padding: 1rem 0.75rem; }
   .hstat-n { font-size: 1.9rem; }
-  .hero h1 { max-width: none; }
+  .hero-left h1 { max-width: none; }
 
   /* hero badge: allow wrapping instead of overflowing */
   .hero-badge { white-space: normal; text-align: center; }
