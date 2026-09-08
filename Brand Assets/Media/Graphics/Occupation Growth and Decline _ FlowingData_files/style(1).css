@@ -1,0 +1,468 @@
+/* #Reset & Basics (Inspired by E. Meyers)
+================================================== */
+	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 100%;
+		font: inherit;
+		vertical-align: baseline; }
+	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+		display: block; }
+	body {
+		line-height: 1; }
+	ol, ul {
+		list-style: none; }
+	blockquote, q {
+		quotes: none; }
+	blockquote:before, blockquote:after,
+	q:before, q:after {
+		content: '';
+		content: none; }
+	table {
+		border-collapse: collapse;
+		border-spacing: 0; }
+
+
+body {
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+/*    background: #58585B;*/
+}
+a {
+    font-style: normal;
+    text-decoration: underline;
+    color: #000;
+}
+#main-wrapper {
+/*    width: 1090px;*/
+/*    max-width: 670px;*/
+    margin: 0px auto;
+}
+#header {
+    margin-bottom: 10px;
+}
+
+.clr { clear: both; }
+.centered { text-align: center; }
+.hidden  { 
+    display: none; 
+    pointer-events: none;
+}
+
+/* Text
+============================ */
+
+h1 {
+	font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+	font-size: 25px;
+	font-style: normal;
+	text-transform: uppercase;
+    margin: 0 0 6px 0px;
+}
+h3 {
+	text-transform: uppercase;
+	font-size: 1em;
+	padding: 3px 0px;
+/*    margin: -5px 0 0px 0;*/
+	font-style: normal;
+}
+.subheader text {
+	font-size: 14px;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+
+
+/* Controls
+============================ */
+
+#update {
+    max-width: 300px;
+	margin: 12px auto 1rem auto;
+}
+.buttons {
+    float: left;
+}
+.buttons h3 {
+    display: inline;
+}
+.button {
+    display: inline;
+	width: 95px;
+	padding: 5px 8px;
+	margin-right: 0px;
+	cursor: pointer;
+	text-align: center;
+	font-size: .9em;
+	border: 1px solid #e0e0e0;
+/*    float: left;*/
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+}
+.button:hover {
+	background: #e0e0e0;
+}
+.button.current {
+	background: #000;
+	color: #fff !important;
+}
+#clear-selections { 
+    text-align: right; 
+    cursor: pointer;
+    margin-top: 1rem;
+    text-transform: uppercase;
+}
+#clear-selections a {
+    display: none;
+    text-decoration: none;
+}
+#clear-selections.fran--active a {
+    display: inline !important;
+    border-bottom: 2px solid #60eae6;
+}
+
+#newsearch { margin-bottom: 1rem; }
+#newsearch input {
+    display: block;
+    font-size: 1.2rem;
+    padding: 4px;
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+    margin: 10px auto 0 auto;
+/*    width: 500px;*/
+    width: 100%;
+}
+.autocomplete-suggestions {
+    text-align: left; cursor: default; 
+    border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);
+
+    /* core styles should not be changed */
+    position: absolute; display: none; z-index: 9999; max-height: 254px; overflow: hidden; overflow-y: auto; box-sizing: border-box;
+}
+.autocomplete-suggestion { position: relative; padding: 0 .6em; line-height: 23px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02rem; color: #333; }
+.autocomplete-suggestion b { font-weight: normal; color: #1f8dd6; }
+.autocomplete-suggestion.selected { background: #f0f0f0; }
+
+
+/* Chart
+============================ */
+
+#charts {
+    position: relative;
+    margin-top: 0px;
+/*    top: 0px;*/
+}
+
+
+
+.layer:hover {
+    stroke: #000;
+    stroke-width: 2px;
+    z-index: 100;
+}
+
+
+.chartbg rect {
+	fill: #f0f0f0;
+}
+
+text.descrip tspan {
+    font-size: 1em;
+}
+.axis text {
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+    font-size: .8rem;
+}
+text.axistitle {
+    fill: #000;
+    text-anchor: start;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+text.lastann { 
+	font-size: .95em;
+/*	text-transform: uppercase;*/
+}
+text.hour {
+    fill: #000;
+    font-size: .9em;
+}
+
+.tracingcircle circle {
+/*    fill: #000000;*/
+    fill: #000;
+/*    fill-opacity: .5;*/
+/*    stroke: #000;*/
+/*    stroke-width: 1px;*/
+/*    stroke-opacity: .6;*/
+}
+.tracingcircle circle.fran--hover, .tracingcircle circle.fran--click, .tracingcircle circle.fran--found {
+    stroke: #000;
+    stroke-opacity: 1;
+    fill: #fff;
+    fill-opacity: 1;
+    stroke-width: 2px;
+}
+.tracingcircle circle.movie--hover, .tracingcircle circle.fran--found {
+    fill: #0f6f6d;
+}
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+/*.y.axis line { stroke-dasharray: 1 2; }*/
+.x.axis line { stroke: #cccccc; stroke-dasharray: 1 1.5; }
+.y.axis line { stroke: #cccccc; stroke-dasharray: 1 1.5; }
+.y.axis path {
+  display: none;
+}
+.y.axis.simple text {
+	display: none;
+}
+line.baseline {
+/*    stroke: #ea19e1;*/
+    stroke: #000;
+    stroke-width: 3px;
+}
+
+.line {
+	fill: none;
+	stroke-width: 1.5px;
+    stroke: #1dd8d3;
+    stroke-opacity: 1;
+}
+.line.fran--hover, .line.fran--click, .line.fran--found {
+  stroke: #0f6f6d;
+  stroke-opacity: 1;
+  stroke-width: 5px;
+}
+.line.fran--click, .line.fran--found {
+    stroke: #0f6f6d;
+    stroke-width: 8px;
+}
+
+.voronoi path {
+    fill: none;
+    stroke: none;
+    stroke-opacity: 0.2;
+    pointer-events: all;
+}
+
+
+/* Annotation
+============================ */
+
+.annog text {
+    font-family: "Mercury SSm A", "Mercury SSm B";
+    font-style: italic;
+    font-weight: 400;
+	font-size: 1rem;
+	line-height: 1.4em;
+}
+.annog .occlabel, .annog .occdiff, .annog .bglabel { 
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+    font-style: normal;
+}
+.annog .occlabel { display: none; }
+.annog .occlabel.showlabel { display: block; }
+
+.annog .bglabel { text-transform: uppercase; font-size: 1.5rem; fill: #ccc; }
+.annog line.arrow { stroke: #ccc; }
+.counterg text {
+    text-transform: uppercase;
+    text-anchor: start;
+/*    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
+}
+.counterg text.counter {
+    font-size: 2rem;
+    fill: #000;
+}
+
+#yaxislabels {
+    position: relative;
+    top: 0px;
+    width: 70px;
+    text-align: center;
+    text-transform: uppercase;
+}
+#yaxislabels #earlier {
+    position: relative;
+    top: 128px;
+}
+#yaxislabels #later {
+    position: relative;
+    top: 238px;
+}
+
+
+#legend {
+    width: 290px;
+    margin: 30px auto;
+}
+#legend svg {
+/*    width: 250px;*/
+}
+#legend .legendtext {
+    font-size: .9em;
+}
+
+#counters {
+    width: 544px;
+    margin: 20px auto 0px auto;
+}
+.label {
+/*    text-align: center;*/
+    font-size: 1.15em;
+/*    text-transform: uppercase;*/
+}
+#counters .counter {
+    text-align: center;
+    width: 180px;
+    float: left;
+    border-left: 1px solid #e0e0e0;
+}
+#counters .counter .count {
+    font-size: 2.5em;
+}
+
+.sectionlabel {
+    text-transform: uppercase;
+    font-size: 1.3em;
+    text-anchor: middle;
+}
+
+#tooltip {
+    text-transform: uppercase;
+    text-anchor: middle;
+    font-size: 1.0em;
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+    pointer-events: none;
+    z-index: 101;
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+/*    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);*/
+}
+#tooltip h3 { 
+  font-size: 14px; margin: 0 0 4px 0; 
+  line-height: 1.2em;
+}
+
+.desc {
+    font-family: "Mercury SSm A", "Mercury SSm B";
+    font-style: italic;
+    font-weight: 400;
+	font-size: .9em;
+	line-height: 1.4em;
+    margin: 0 auto;
+}
+
+.focus text {
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+/*    font-size: 11px;*/
+}
+.focus text#franname {
+    text-transform: uppercase;
+    font-size: .9em;
+}
+.focus text#gross {
+    fill: #666;
+    font-size: .9em;
+}
+
+line.annotation {
+    stroke: #ccc;
+	stroke-dasharray: 5,2;
+	stroke-width: 1.2px;
+}
+text.annotation, #line-chart .agehighlight text {
+    font-family: 'Inconsolata', Monaco, "Lucida Console", Consolas, "Courier New";
+    font-size: 14px;
+    fill: #444;
+    text-anchor: end;
+}
+text.descrip {
+    font-family: "Mercury SSm A", "Mercury SSm B";
+    font-style: italic;
+    font-weight: 400;
+	font-size: 13px;
+	line-height: 1.4em;
+}
+
+
+:root {
+      --line-chart-color: #666;
+      --annotation-context-color: #666;
+      --annotation-above-color: #666;
+      --annotation-anomaly-color: #666;
+    }
+.annotation path {
+/*      stroke: var(--annotation-context-color);*/
+    stroke: #000000;
+    fill: none;
+    }
+
+    .annotation:not(.above):not(.anomaly) path {
+/*      stroke-dasharray: 1,2;*/
+        stroke-width: 1.5px;
+    }
+
+    .annotation text {
+/*      fill: #666;*/
+/*      text-transform: uppercase;*/
+      text-shadow: 0 3px 0 #fff, 3px 0 0 #fff, 0 -3px 0 #fff, -3px 0 0 #fff;
+    }
+    .annotation .annotation-note-content .annotation-note-title {
+        fill: #666;
+        text-transform: uppercase;
+        font-size: .95em;
+    }
+    .annotation .annotation-note-content .annotation-note-label {
+        font-size: 1.1em;
+        font-weight: bold;
+        
+    }
+
+    .annotation.above path {
+      stroke: var(--annotation-above-color);
+    }
+
+    .annotation.above text {
+      fill: #666;
+    }
+
+    .annotation.anomaly path {
+      stroke: var(--annotation-anomaly-color);
+      stroke-width: 2px;
+    }
+
+    .annotation.anomaly text {
+      fill: #666;
+    }
+
+    .annotation-note-bg {
+      fill: rgba(0, 0, 0, 0);
+    }
+
+    .annotation-note-title {
+        text-transform: none;
+        fill: #000;
+/*        font-size: .9em;*/
+/*      font-weight: bold;*/
+    }
+
+    text.title {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+
+
+
+
