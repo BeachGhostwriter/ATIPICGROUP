@@ -146,6 +146,41 @@ canvas{display:block;}
 .removal-wrap{overflow-x:auto;}
 .removal-bar{height:8px;border-radius:2px;background:var(--green);}
 
+/* Goal-first water treatment flow */
+.goal-flow{--goal-blue:#2879c7;--goal-brown:#9a6840;--goal-red:#c94d48;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin:18px 0 24px;}
+.goal-flow-head{margin-bottom:18px;}
+.goal-flow-title{font-family:ui-serif,Georgia,serif;font-size:18px;font-weight:400;color:var(--ink);margin:0 0 6px;}
+.goal-flow-intro{font-size:12px;line-height:1.6;color:var(--ink-2);margin:0;max-width:760px;}
+.goal-flow-legend{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;margin:14px 0;color:var(--ink-3);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.goal-flow-legend .planning{color:var(--goal-blue);}
+.goal-flow-legend .water-direction{color:var(--goal-red);}
+.goal-flow-sequence{position:relative;display:flex;align-items:stretch;gap:6px;}
+.goal-flow-sequence::before{position:absolute;top:50%;right:18px;left:18px;height:3px;content:"";background:linear-gradient(90deg,var(--goal-blue),#6684a3 32%,var(--goal-brown) 66%,var(--goal-red));opacity:.58;}
+.goal-flow-step{position:relative;z-index:1;flex:1 1 0;min-width:0;padding:14px 12px;background:var(--surface);border:1px solid var(--border);border-top:4px solid var(--step-color);border-radius:var(--radius);box-shadow:0 4px 14px rgba(20,40,60,.06);}
+.goal-flow-step.target{--step-color:var(--goal-blue);background:var(--accent-lt);}
+.goal-flow-step.polish{--step-color:#6684a3;}
+.goal-flow-step.core{--step-color:var(--goal-brown);}
+.goal-flow-step.prep{--step-color:#ad6245;}
+.goal-flow-step.sources{--step-color:var(--goal-red);}
+.goal-flow-step small{display:block;margin-bottom:6px;color:var(--step-color);font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;}
+.goal-flow-step strong{display:block;color:var(--ink);font-size:12px;line-height:1.35;}
+.goal-flow-step p{margin:5px 0 0;color:var(--ink-2);font-size:10px;line-height:1.5;}
+.goal-flow-sources{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.goal-flow-sources span{padding:3px 6px;border-radius:20px;background:rgba(201,77,72,.12);color:var(--goal-red);font-size:9px;font-weight:600;}
+.goal-flow-link{position:relative;display:flex;flex:0 0 24px;align-items:center;justify-content:center;color:var(--goal-brown);font-size:18px;font-weight:800;}
+.goal-flow-link::after{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--goal-red);content:"";animation:goal-flow-left 1.7s ease-in-out infinite;}
+@keyframes goal-flow-left{from{transform:translateX(7px);opacity:.2;}55%{opacity:1;}to{transform:translateX(-7px);opacity:.2;}}
+@media(max-width:760px){
+  .goal-flow{padding:16px;}
+  .goal-flow-sequence{flex-direction:column;}
+  .goal-flow-sequence::before{top:18px;right:auto;bottom:18px;left:50%;width:3px;height:auto;background:linear-gradient(180deg,var(--goal-blue),#6684a3 32%,var(--goal-brown) 66%,var(--goal-red));}
+  .goal-flow-step{flex-basis:auto;}
+  .goal-flow-link{flex-basis:20px;min-height:20px;transform:rotate(90deg);}
+  .goal-flow-link::after{animation-name:goal-flow-up;}
+  @keyframes goal-flow-up{from{transform:translateY(5px);opacity:.2;}55%{opacity:1;}to{transform:translateY(-5px);opacity:.2;}}
+}
+@media(prefers-reduced-motion:reduce){.goal-flow-link::after{animation:none;opacity:0;}}
+
 /* Responsive */
 @media(max-width:900px){:root{--sw:0px;}.sidebar{transform:translateX(-220px);}.main{margin-left:0;}.kpi-strip,.form-grid{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}}
 @media(max-width:600px){.kpi-strip,.form-grid{grid-template-columns:1fr;}.content{padding:18px 16px 40px;}}
@@ -662,6 +697,49 @@ canvas{display:block;}
     <div class="chart-wrap" style="padding:24px 0;">
       <canvas id="sankeyCanvas" style="width:100%;display:block;"></canvas>
     </div>
+    <section class="goal-flow" aria-labelledby="goalFlowTitle">
+      <div class="goal-flow-head">
+        <h2 class="goal-flow-title" id="goalFlowTitle">Start with the water you need</h2>
+        <p class="goal-flow-intro">Define the company objective first, then work back from the required water quality to the treatment train and available water sources.</p>
+      </div>
+      <div class="goal-flow-legend">
+        <span class="planning">Planning logic: target → treatment design → source analysis</span>
+        <span class="water-direction">Water flow: sources ← treatment ← clean water</span>
+      </div>
+      <div class="goal-flow-sequence" role="img" aria-label="Goal-first treatment plan: set a clean-water objective, choose final polishing and core treatment, condition the feed, then identify process, river, aquifer, and field runoff sources. Water flows from sources on the right toward the clean-water objective on the left.">
+        <div class="goal-flow-step target">
+          <small>Company objective</small>
+          <strong>Clean water for reuse</strong>
+          <p>Set target quality, volume and reliability.</p>
+        </div>
+        <span class="goal-flow-link" aria-hidden="true">←</span>
+        <div class="goal-flow-step polish">
+          <small>03 · Finish</small>
+          <strong>Final polishing</strong>
+          <p>Verify quality for its intended use.</p>
+        </div>
+        <span class="goal-flow-link" aria-hidden="true">←</span>
+        <div class="goal-flow-step core">
+          <small>02 · Treat</small>
+          <strong>Core treatment</strong>
+          <p>Select processes for contaminants and recovery goals.</p>
+        </div>
+        <span class="goal-flow-link" aria-hidden="true">←</span>
+        <div class="goal-flow-step prep">
+          <small>01 · Understand</small>
+          <strong>Feed conditioning</strong>
+          <p>Adapt to source quality and variability.</p>
+        </div>
+        <span class="goal-flow-link" aria-hidden="true">←</span>
+        <div class="goal-flow-step sources">
+          <small>Original water · source mix</small>
+          <strong>Identify the sources</strong>
+          <div class="goal-flow-sources">
+            <span>Process water</span><span>River</span><span>Aquifer</span><span>Fields / runoff</span>
+          </div>
+        </div>
+      </div>
+    </section>
     <div class="kpi-strip" id="sankeyKpis" style="margin-top:16px;"></div>
     <div class="sec-head" style="margin-top:24px;"><h2 class="sec-title">Process Mass Balance</h2><span class="sec-sub">IWA standard water audit framework</span></div>
     <div class="tbl-wrap"><table class="dt"><thead><tr><th>Flow Stream</th><th style="text-align:right">Flow (m³/h)</th><th style="text-align:right">Flow (ML/d)</th><th style="text-align:right">% of Intake</th><th>Category</th></tr></thead><tbody id="sankeyTbody"></tbody></table></div>
