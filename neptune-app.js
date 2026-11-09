@@ -2315,13 +2315,6 @@ let journeyFrame=0;
 let journeyResizeHandler=null;
 let journeyVisibilityHandler=null;
 
-function journeyBox(ctx,x,y,w,h,r,fill,stroke){
-  ctx.beginPath();
-  ctx.roundRect(x,y,w,h,r);
-  ctx.fillStyle=fill;ctx.fill();
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
-}
-
 function journeyText(ctx,text,x,y,size,color,weight="400",align="left"){
   ctx.fillStyle=color;
   ctx.font=`${weight} ${size}px system-ui, sans-serif`;
@@ -2329,13 +2322,66 @@ function journeyText(ctx,text,x,y,size,color,weight="400",align="left"){
   ctx.fillText(text,x,y);
 }
 
+function journeyBackground(ctx,w,h){
+  const sky=ctx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,"#08141d");sky.addColorStop(.68,"#101f28");sky.addColorStop(1,"#172831");
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  const glow=ctx.createRadialGradient(w*.52,h*.56,5,w*.52,h*.56,w*.58);
+  glow.addColorStop(0,"rgba(66,123,145,.13)");glow.addColorStop(1,"rgba(8,20,29,0)");
+  ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle="rgba(154,188,201,.09)";ctx.lineWidth=1;
+  for(let i=0;i<18;i++){
+    const x=(i*173)%w,y=92+(i*61)%(h*.42);
+    ctx.fillStyle=i%3?"rgba(136,181,198,.34)":"rgba(231,174,113,.42)";
+    ctx.fillRect(x,y,1.5,1.5);
+  }
+}
+
+function journeyLabel(ctx,x,y,step,title,detail,color){
+  journeyText(ctx,step,x,y,9,color,"700","center");
+  journeyText(ctx,title,x,y+19,13,"#edf5f8","600","center");
+  journeyText(ctx,detail,x,y+35,9,"#a6bac4","400","center");
+}
+
+function journeyGauge(ctx,x,y,r,color,label){
+  ctx.save();
+  ctx.fillStyle="#10212a";ctx.strokeStyle="#728994";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.strokeStyle=color;ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(x,y,r-4,Math.PI*.78,Math.PI*1.72);ctx.stroke();
+  ctx.strokeStyle="#eaf3f6";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(-Math.PI*.22)*(r-5),y+Math.sin(-Math.PI*.22)*(r-5));ctx.stroke();
+  ctx.fillStyle="#dce8ed";ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+  if(label)journeyText(ctx,label,x,y+r+10,6,"#a9bdc7","600","center");
+  ctx.restore();
+}
+
+function journeyPump(ctx,x,y,r,color){
+  ctx.save();
+  ctx.fillStyle="#203943";ctx.strokeStyle="#91a8b2";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r*.58,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#dce8ed";ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(x-r*.35,y);ctx.lineTo(x+r*.35,y);ctx.moveTo(x,y-r*.35);ctx.lineTo(x,y+r*.35);ctx.stroke();
+  ctx.restore();
+}
+
+function journeyTarget(ctx,x,y){
+  journeyRack(ctx,x-8,y+133,106);
+  journeyIsometricTank(ctx,x+6,y+3,72,121,"rgba(77,169,239,.5)");
+  journeyGauge(ctx,x+42,y-10,12,"#4da9ef","POTABLE");
+  ctx.strokeStyle="#91b9ca";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x+42,y+129);ctx.lineTo(x+42,y+141);ctx.stroke();
+  journeyPump(ctx,x+42,y+144,9,"#4da9ef");
+}
+
 function journeyWaterColor(t){
   const stops=[
-    {at:0,color:[40,121,199]},
-    {at:.48,color:[154,104,64]},
-    {at:1,color:[201,77,72]},
+    {at:0,color:[77,169,239]},
+    {at:.5,color:[189,134,87]},
+    {at:1,color:[238,98,90]},
   ];
-  const i=t<.48?0:1;
+  const i=t<.5?0:1;
   const a=stops[i],b=stops[i+1];
   const p=Math.max(0,Math.min(1,(t-a.at)/(b.at-a.at)));
   const rgb=a.color.map((v,j)=>Math.round(v+(b.color[j]-v)*p));
@@ -2343,193 +2389,221 @@ function journeyWaterColor(t){
 }
 
 function journeyPipe(ctx,vertical,time,reduced){
-  const grad=vertical?ctx.createLinearGradient(0,80,0,690):ctx.createLinearGradient(55,0,1145,0);
-  grad.addColorStop(0,"#2879c7");
-  grad.addColorStop(.48,"#9a6840");
-  grad.addColorStop(1,"#c94d48");
+  const grad=vertical?ctx.createLinearGradient(0,105,0,735):ctx.createLinearGradient(25,0,1175,0);
+  grad.addColorStop(0,"#4da9ef");
+  grad.addColorStop(.5,"#bd8657");
+  grad.addColorStop(1,"#ee625a");
   ctx.save();
   ctx.lineCap="round";
-  ctx.strokeStyle="#c8d6df";ctx.lineWidth=30;
+  ctx.shadowColor="rgba(57,151,204,.42)";ctx.shadowBlur=15;
+  ctx.strokeStyle="#203745";ctx.lineWidth=34;
   ctx.beginPath();
-  if(vertical){ctx.moveTo(195,88);ctx.lineTo(195,690);}
-  else{ctx.moveTo(55,278);ctx.lineTo(1145,278);}
+  if(vertical){ctx.moveTo(195,105);ctx.lineTo(195,735);}
+  else{ctx.moveTo(25,326);ctx.lineTo(1175,326);}
   ctx.stroke();
-  ctx.strokeStyle=grad;ctx.lineWidth=19;ctx.stroke();
-  ctx.strokeStyle="rgba(255,255,255,.55)";ctx.lineWidth=2;
+  ctx.shadowBlur=0;
+  ctx.strokeStyle="#0a1822";ctx.lineWidth=24;ctx.stroke();
+  ctx.strokeStyle=grad;ctx.lineWidth=13;ctx.stroke();
+  ctx.strokeStyle="rgba(215,241,255,.52)";ctx.lineWidth=1.5;
   ctx.beginPath();
-  if(vertical){ctx.moveTo(189,95);ctx.lineTo(189,682);}
-  else{ctx.moveTo(65,270);ctx.lineTo(1135,270);}
+  if(vertical){ctx.moveTo(189,115);ctx.lineTo(189,725);}
+  else{ctx.moveTo(35,319);ctx.lineTo(1165,319);}
   ctx.stroke();
 
-  const count=vertical?20:34,span=vertical?570:1010;
+  const count=vertical?27:46,span=vertical?590:1080;
   for(let i=0;i<count;i++){
     const drift=reduced?0:(time*.055+i*(span/count))%span;
     ctx.beginPath();
     if(vertical){
-      const y=675-drift;
-      ctx.fillStyle=journeyWaterColor(Math.max(0,Math.min(1,(y-105)/570)));
-      ctx.arc(195+Math.sin(i*1.7)*3,y,2+(i%3)*.65,0,Math.PI*2);
+      const y=720-drift;
+      ctx.fillStyle=journeyWaterColor(Math.max(0,Math.min(1,(y-115)/610)));
+      ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=8;
+      ctx.arc(195+Math.sin(i*1.7)*2,y,1.8+(i%3)*.55,0,Math.PI*2);
     }else{
-      const x=1125-drift;
-      ctx.fillStyle=journeyWaterColor(Math.max(0,Math.min(1,(x-65)/1070)));
-      ctx.arc(x,278+Math.sin(i*1.7)*3,2+(i%3)*.65,0,Math.PI*2);
+      const x=1155-drift;
+      ctx.fillStyle=journeyWaterColor(Math.max(0,Math.min(1,(x-35)/1130)));
+      ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=9;
+      ctx.arc(x,326+Math.sin(i*1.7)*2,2+(i%3)*.55,0,Math.PI*2);
     }
     ctx.fill();
   }
+  ctx.shadowBlur=0;
 
-  const arrowPositions=vertical?[185,335,485,625]:[300,520,760,970];
+  const arrowPositions=vertical?[190,345,505,675]:[250,490,740,1010];
   arrowPositions.forEach((p,i)=>{
-    ctx.fillStyle=i<1?"#2879c7":i>2?"#c94d48":"#9a6840";
+    ctx.fillStyle=i<1?"#4da9ef":i>2?"#ee625a":"#bd8657";
     ctx.beginPath();
     if(vertical){
-      ctx.moveTo(195,p-11);ctx.lineTo(187,p+2);ctx.lineTo(203,p+2);
+      ctx.moveTo(195,p-10);ctx.lineTo(188,p+1);ctx.lineTo(202,p+1);
     }else{
-      ctx.moveTo(p-11,278);ctx.lineTo(p+2,270);ctx.lineTo(p+2,286);
+      ctx.moveTo(p-10,326);ctx.lineTo(p+1,319);ctx.lineTo(p+1,333);
     }
     ctx.closePath();ctx.fill();
   });
-  ctx.restore();
-}
-
-function journeyHeading(ctx,x,step,title,detail,color){
-  journeyText(ctx,step,x,34,10,color,"700","center");
-  journeyText(ctx,title,x,53,13,"#173a50","600","center");
-  journeyText(ctx,detail,x,69,10,"#6a8598","400","center");
-}
-
-function journeyTank(ctx,x,y,w,h,blue){
-  const rim=blue?"#2879c7":"#9a6840";
-  const water=blue?"rgba(40,121,199,.34)":"rgba(154,104,64,.28)";
-  ctx.save();
-  journeyBox(ctx,x,y,w,h,13,"rgba(255,255,255,.88)","#9eb4c2");
-  ctx.fillStyle=water;
-  ctx.beginPath();
-  ctx.moveTo(x+2,y+h*.54);
-  ctx.bezierCurveTo(x+w*.28,y+h*.48,x+w*.68,y+h*.60,x+w-2,y+h*.52);
-  ctx.lineTo(x+w-2,y+h-3);ctx.lineTo(x+2,y+h-3);ctx.closePath();ctx.fill();
-  ctx.strokeStyle="rgba(255,255,255,.85)";ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(x+5,y+h*.54);ctx.bezierCurveTo(x+w*.3,y+h*.48,x+w*.65,y+h*.6,x+w-5,y+h*.52);ctx.stroke();
-  ctx.fillStyle=rim;ctx.fillRect(x+w*.28,y-7,w*.44,7);
-  ctx.strokeStyle=rim;ctx.lineWidth=2;ctx.strokeRect(x+w*.28,y-7,w*.44,7);
-  ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(x+w*.5,y+h*.78,12,0,Math.PI*2);ctx.fill();
-  journeyText(ctx,"✓",x+w*.5,y+h*.78+5,16,rim,"700","center");
-  ctx.restore();
-}
-
-function journeyMonitor(ctx,x,y){
-  journeyBox(ctx,x,y,145,100,10,"#edf3f7","#8da5b3");
-  journeyBox(ctx,x+12,y+13,81,48,5,"#17384c","#7894a4");
-  ctx.strokeStyle="#69b7d0";ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(x+21,y+47);ctx.lineTo(x+36,y+37);ctx.lineTo(x+49,y+42);ctx.lineTo(x+63,y+27);ctx.lineTo(x+83,y+33);ctx.stroke();
-  ctx.fillStyle="#55a976";ctx.beginPath();ctx.arc(x+116,y+26,6,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle="#7894a4";ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(x+116,y+66,18,Math.PI,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle="#2879c7";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+116,y+66);ctx.lineTo(x+127,y+52);ctx.stroke();
-  ctx.fillStyle="#6a8598";ctx.fillRect(x+25,y+75,95,5);
-}
-
-function journeyMembranes(ctx,x,y){
-  for(let row=0;row<3;row++){
-    const yy=y+row*34;
-    journeyBox(ctx,x,yy,158,24,12,"#f8fbfc","#9a6840");
-    ctx.fillStyle="rgba(154,104,64,.16)";
-    ctx.beginPath();ctx.roundRect(x+24,yy+5,110,14,7);ctx.fill();
-    for(let i=0;i<6;i++){
-      ctx.strokeStyle=i%2?"#c3d0d6":"#b58c69";ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(x+34+i*17,yy+6);ctx.lineTo(x+34+i*17,yy+18);ctx.stroke();
-    }
-    ctx.fillStyle="#9a6840";ctx.beginPath();ctx.arc(x+12,yy+12,4,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(x+146,yy+12,4,0,Math.PI*2);ctx.fill();
-  }
-}
-
-function journeySources(ctx,x,y){
-  const items=[
-    ["Process","#c94d48"],["River","#2879c7"],["Aquifer","#6684a3"],["Fields","#9a6840"],
-  ];
-  items.forEach((item,i)=>{
-    const col=i%2,row=Math.floor(i/2),bx=x+col*88,by=y+row*48;
-    journeyBox(ctx,bx,by,80,39,7,"rgba(255,255,255,.91)","#e0c4bd");
-    ctx.fillStyle=item[1];ctx.beginPath();ctx.arc(bx+13,by+19,5,0,Math.PI*2);ctx.fill();
-    journeyText(ctx,item[0],bx+25,by+23,10,"#566c79","600");
+  const collars=vertical?[150,270,400,540,660]:[95,330,565,800,1040,1110];
+  collars.forEach(p=>{
+    ctx.fillStyle="#456171";
+    if(vertical){ctx.fillRect(181,p-3,28,6);ctx.fillStyle="#9bb0ba";ctx.fillRect(184,p-1,22,2);}
+    else{ctx.fillRect(p-3,310,6,32);ctx.fillStyle="#9bb0ba";ctx.fillRect(p-1,314,2,24);}
   });
+  ctx.restore();
+}
+
+function journeyFactory(ctx,x,y,s){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.fillStyle="#192e39";ctx.strokeStyle="#87a0ac";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(15,-13);ctx.lineTo(32,-2);ctx.lineTo(47,-20);ctx.lineTo(65,-5);ctx.lineTo(82,-12);ctx.lineTo(82,34);ctx.lineTo(0,34);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle="#10212a";ctx.fillRect(10,12,10,22);ctx.fillRect(31,11,10,23);ctx.fillRect(54,10,10,24);
+  ctx.fillStyle="#ee625a";ctx.globalAlpha=.72;ctx.fillRect(24,-28,8,39);ctx.fillRect(59,-35,7,30);ctx.globalAlpha=1;
+  ctx.strokeStyle="#9bb0ba";ctx.beginPath();ctx.moveTo(28,-28);ctx.lineTo(28,-40);ctx.moveTo(62,-35);ctx.lineTo(62,-48);ctx.stroke();
+  ctx.restore();
+}
+
+function journeySourceLandscape(ctx,x,y){
+  ctx.save();
+  const land=ctx.createLinearGradient(0,y,0,y+112);
+  land.addColorStop(0,"rgba(189,134,87,.3)");land.addColorStop(1,"rgba(189,134,87,.02)");
+  ctx.fillStyle=land;ctx.beginPath();ctx.moveTo(x,y+47);ctx.lineTo(x+190,y+29);ctx.lineTo(x+190,y+112);ctx.lineTo(x,y+112);ctx.closePath();ctx.fill();
+  ctx.strokeStyle="rgba(215,168,130,.7)";ctx.lineWidth=1.2;
+  for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(x+91,y+67+i*7);ctx.lineTo(x+180,y+54+i*7);ctx.stroke();}
+  ctx.strokeStyle="#4da9ef";ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x+71,y+52);ctx.bezierCurveTo(x+91,y+34,x+111,y+69,x+132,y+51);ctx.bezierCurveTo(x+148,y+37,x+163,y+57,x+188,y+46);ctx.stroke();
+  ctx.strokeStyle="rgba(147,210,244,.65)";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+76,y+55);ctx.bezierCurveTo(x+95,y+39,x+110,y+71,x+132,y+54);ctx.stroke();
+  ctx.strokeStyle="#859ca7";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+63,y+70);ctx.lineTo(x+63,y+116);ctx.moveTo(x+55,y+70);ctx.lineTo(x+71,y+70);ctx.moveTo(x+56,y+111);ctx.lineTo(x+71,y+111);ctx.stroke();
+  ctx.strokeStyle="#4da9ef";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+63,y+76);ctx.lineTo(x+63,y+107);ctx.stroke();
+  journeyFactory(ctx,x+3,y+69,.75);
+  journeyText(ctx,"PROCESS",x+31,y+116,7,"#ee8179","700","center");
+  journeyText(ctx,"RIVER",x+125,y+116,7,"#70b8ec","700","center");
+  journeyText(ctx,"AQUIFER",x+64,y+129,7,"#a4bbc6","700","center");
+  journeyText(ctx,"FIELDS",x+151,y+105,7,"#d7a982","700","center");
+  ctx.restore();
+}
+
+function journeyIsometricTank(ctx,x,y,w,h,water){
+  ctx.save();
+  const ry=Math.max(8,w*.17),rx=w/2;
+  const shell=ctx.createLinearGradient(x,0,x+w,0);
+  shell.addColorStop(0,"#152b36");shell.addColorStop(.18,"#78909a");shell.addColorStop(.35,"#314b57");shell.addColorStop(.72,"#1b303a");shell.addColorStop(1,"#0e2029");
+  ctx.fillStyle=shell;ctx.fillRect(x,y+ry,w,h-2*ry);
+  ctx.fillStyle="#233d49";ctx.beginPath();ctx.ellipse(x+rx,y+ry,rx,ry,0,Math.PI,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#a5b7bf";ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle="#111f27";ctx.beginPath();ctx.ellipse(x+rx,y+h-ry,rx,ry,0,0,Math.PI);ctx.fill();ctx.strokeStyle="#536e79";ctx.stroke();
+  ctx.save();ctx.beginPath();ctx.rect(x+2,y+ry,w-4,h-2*ry);ctx.clip();
+  ctx.fillStyle=water;ctx.fillRect(x+2,y+h*.54,w-4,h*.46);
+  ctx.strokeStyle="rgba(178,224,242,.85)";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x+2,y+h*.54);ctx.bezierCurveTo(x+w*.3,y+h*.47,x+w*.7,y+h*.6,x+w-2,y+h*.53);ctx.stroke();
+  ctx.restore();
+  ctx.strokeStyle="#9dafb7";ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x+rx,y+ry,rx,ry,0,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+rx,y-14);ctx.lineTo(x+rx,y+ry);ctx.stroke();
+  ctx.fillStyle="#aabac1";ctx.fillRect(x+rx-5,y-16,10,4);
+  for(let i=0;i<3;i++){const xx=x+8+i*7;ctx.strokeStyle="#5c7480";ctx.beginPath();ctx.moveTo(xx,y+ry);ctx.lineTo(xx,y+h-ry);ctx.stroke();}
+  ctx.restore();
+}
+
+function journeyRack(ctx,x,y,w){
+  ctx.save();
+  ctx.strokeStyle="rgba(152,178,190,.72)";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.moveTo(x+8,y);ctx.lineTo(x+8,y+13);ctx.moveTo(x+w-8,y);ctx.lineTo(x+w-8,y+13);ctx.moveTo(x+8,y+13);ctx.lineTo(x+w-8,y+13);ctx.stroke();
+  ctx.strokeStyle="rgba(130,159,173,.35)";ctx.lineWidth=1;
+  for(let i=1;i<7;i++){const xx=x+w*i/7;ctx.beginPath();ctx.moveTo(xx,y+1);ctx.lineTo(xx,y+12);ctx.stroke();}
+  ctx.restore();
+}
+
+function journeySkid(ctx,x,y){
+  ctx.save();
+  journeyRack(ctx,x,y+65,180);
+  for(let i=0;i<3;i++){
+    const cy=y+i*26;
+    ctx.shadowColor="rgba(189,134,87,.24)";ctx.shadowBlur=10;
+    ctx.fillStyle="#263f4a";ctx.strokeStyle="#a7b8bf";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(x+12,cy,153,19,9);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    const g=ctx.createLinearGradient(x+12,cy,x+165,cy);
+    g.addColorStop(0,"#6b828b");g.addColorStop(.18,"#1d333e");g.addColorStop(.85,"#273e48");g.addColorStop(1,"#8498a0");
+    ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(x+17,cy+4,143,11,6);ctx.fill();
+    for(let j=0;j<8;j++){ctx.strokeStyle=j%2?"rgba(230,239,242,.5)":"rgba(189,134,87,.8)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+34+j*16,cy+4);ctx.lineTo(x+34+j*16,cy+15);ctx.stroke();}
+  }
+  ctx.strokeStyle="#a6b8bf";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x+22,y+3);ctx.lineTo(x+22,y-10);ctx.lineTo(x+150,y-10);ctx.lineTo(x+150,y+3);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+22,y+65);ctx.lineTo(x+22,y+78);ctx.lineTo(x+150,y+78);ctx.lineTo(x+150,y+65);ctx.stroke();
+  journeyGauge(ctx,x+150,y-26,12,"#bd8657","75 BAR");
+  ctx.restore();
+}
+
+function journeyAnalyzer(ctx,x,y){
+  ctx.save();
+  journeyRack(ctx,x-8,y+82,145);
+  ctx.strokeStyle="#8ea8b4";ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(x+8,y+67);ctx.lineTo(x+8,y+78);ctx.lineTo(x+133,y+78);ctx.lineTo(x+133,y+67);ctx.stroke();
+  journeyGauge(ctx,x+28,y+18,18,"#4da9ef","QUALITY");
+  journeyGauge(ctx,x+111,y+18,18,"#bd8657","FLOW");
+  ctx.fillStyle="#304b57";ctx.fillRect(x+38,y+49,64,16);ctx.strokeStyle="#93aab4";ctx.strokeRect(x+38,y+49,64,16);
+  for(let i=0;i<4;i++){ctx.fillStyle=["#4da9ef","#9bcce4","#bd8657","#ee625a"][i];ctx.beginPath();ctx.arc(x+47+i*15,y+57,3,0,Math.PI*2);ctx.fill();}
+  journeyPump(ctx,x+72,y+78,12,"#4da9ef");
+  ctx.restore();
 }
 
 function drawJourneyDesktop(ctx,w,h,time,reduced){
-  ctx.save();ctx.scale(w/1200,h/520);
-  const bg=ctx.createLinearGradient(0,0,0,520);
-  bg.addColorStop(0,"#f9fcfe");bg.addColorStop(1,"#edf3f6");
-  ctx.fillStyle=bg;ctx.fillRect(0,0,1200,520);
-
-  [145,385,640,850,1055].forEach((x,i)=>{
-    ctx.fillStyle=i===0?"rgba(40,121,199,.05)":i===4?"rgba(201,77,72,.05)":"rgba(154,104,64,.035)";
-    ctx.beginPath();ctx.arc(x,278,96,0,Math.PI*2);ctx.fill();
-  });
+  ctx.save();ctx.scale(w/1200,h/560);
+  journeyBackground(ctx,1200,560);
   journeyPipe(ctx,false,time,reduced);
-
-  journeyHeading(ctx,145,"CLEAN-WATER TARGET","Clean, safe water","Set quality · volume · reliability","#2879c7");
-  journeyHeading(ctx,385,"03 · MONITOR","Measure & verify","Traceable dosing and operation","#6684a3");
-  journeyHeading(ctx,640,"02 · TREAT","Controlled separation","Membrane treatment, sized to the task","#9a6840");
-  journeyHeading(ctx,850,"01 · PLAN","Understand the feed","Analysis · objectives · constraints","#ad6245");
-  journeyHeading(ctx,1055,"SOURCE WATER","Identify available sources","Original quality · variable loads","#c94d48");
-
-  journeyTank(ctx,93,167,105,177,true);
-  journeyText(ctx,"REUSE",145,248,10,"#2879c7","700","center");
-  journeyMonitor(ctx,313,184);
-  journeyMembranes(ctx,563,196);
-  journeyTank(ctx,794,183,112,150,false);
-  journeyText(ctx,"FEED",850,258,10,"#9a6840","700","center");
-  journeySources(ctx,970,177);
-
-  ctx.strokeStyle="rgba(106,133,152,.35)";ctx.lineWidth=1;
-  [[145,348,145,378],[385,290,385,378],[640,300,640,378],[850,340,850,378],[1055,276,1055,378]].forEach(a=>{
-    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke();
-  });
-  ctx.fillStyle="#fff";ctx.fillRect(0,379,1200,141);
-  ctx.strokeStyle="#d6e0e6";ctx.beginPath();ctx.moveTo(0,379);ctx.lineTo(1200,379);ctx.stroke();
-  journeyText(ctx,"WATER MOVES FROM SOURCE TO TARGET  ←",600,407,10,"#6a8598","700","center");
-  journeyText(ctx,"THE DESIGN PROCESS STARTS WITH THE TARGET  →",600,434,10,"#2879c7","700","center");
+  ctx.strokeStyle="rgba(130,161,174,.18)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,410);ctx.lineTo(1200,410);
+  for(let i=0;i<=12;i++){const x=i*100;ctx.moveTo(x,410);ctx.lineTo(600+(x-600)*1.48,558);}
+  for(let i=1;i<5;i++){const y=410+i*29;ctx.moveTo(0,y);ctx.lineTo(1200,y);}
+  ctx.stroke();journeyRack(ctx,55,405,1090);
+  journeyLabel(ctx,145,34,"CLEAN-WATER TARGET","Clean, safe water","Set the company objective","#4da9ef");
+  journeyLabel(ctx,383,34,"03 · MONITOR","Measure & verify","Confirm quality in operation","#74b7de");
+  journeyLabel(ctx,625,34,"02 · TREAT","RCDT membrane train","Separate dissolved loads","#bd8657");
+  journeyLabel(ctx,850,34,"01 · PLAN","Understand the feed","Analysis · objectives · constraints","#d29a6c");
+  journeyLabel(ctx,1050,34,"SOURCE WATER","Select what is available","Variable quality · multiple sources","#ee746b");
+  journeyTarget(ctx,83,187);
+  journeyAnalyzer(ctx,310,210);
+  journeySkid(ctx,540,231);
+  journeyIsometricTank(ctx,805,218,42,158,"rgba(189,134,87,.28)");
+  journeyIsometricTank(ctx,862,239,42,137,"rgba(201,77,72,.26)");
+  journeyRack(ctx,792,383,126);
+  journeySourceLandscape(ctx,961,244);
+  const connectors=[[145,350,145,397],[383,319,383,397],[625,323,625,397],[850,382,850,397],[1050,380,1050,397]];
+  ctx.strokeStyle="rgba(168,190,199,.48)";ctx.lineWidth=1;
+  connectors.forEach(a=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke();});
+  journeyText(ctx,"PLANNING STARTS WITH THE TARGET  →",600,456,9,"#64b0e5","700","center");
+  journeyText(ctx,"WATER FLOWS FROM SOURCES TO CLEAN WATER  ←",600,480,9,"#d2b08e","700","center");
+  journeyText(ctx,"QUALITY IMPROVES ALONG THE TREATMENT TRAIN",600,518,8,"#91aab5","500","center");
   ctx.restore();
 }
 
 function journeySmallStage(ctx,y,side,step,title,detail,color,kind){
   const left=side==="left",iconX=left?23:222;
-  const align="left",blockX=left?202:20;
-  const lineX=left?iconX+139:iconX;
+  const align=left?"left":"right",blockX=left?202:370;
+  const lineX=left?(kind==="membrane"?iconX+180:iconX+82):iconX;
   ctx.strokeStyle=color;ctx.lineWidth=2;ctx.globalAlpha=.6;
   ctx.beginPath();ctx.moveTo(195,y);ctx.lineTo(lineX,y);ctx.stroke();ctx.globalAlpha=1;
   ctx.fillStyle=color;ctx.beginPath();ctx.arc(195,y,5,0,Math.PI*2);ctx.fill();
-  if(kind==="tank")journeyTank(ctx,iconX,y-34,112,68,true);
-  if(kind==="monitor")journeyMonitor(ctx,iconX,y-38);
+  if(kind==="tank")journeyIsometricTank(ctx,iconX+30,y-35,52,68,"rgba(77,169,239,.5)");
+  if(kind==="monitor")journeyAnalyzer(ctx,iconX+8,y-42);
   if(kind==="membrane"){
-    for(let i=0;i<2;i++)journeyBox(ctx,iconX,y-24+i*24,140,17,9,"#f8fbfc","#9a6840");
+    journeySkid(ctx,iconX,y-34);
   }
-  if(kind==="plan")journeyTank(ctx,iconX,y-39,112,78,false);
-  journeyText(ctx,step,blockX,y-10,9,color,"700",align);
-  journeyText(ctx,title,blockX,y+8,11,"#173a50","600",align);
-  journeyText(ctx,detail,blockX,y+24,9,"#6a8598","400",align);
+  if(kind==="plan"){journeyIsometricTank(ctx,iconX+8,y-39,34,78,"rgba(189,134,87,.35)");journeyIsometricTank(ctx,iconX+51,y-29,34,68,"rgba(201,77,72,.25)");}
+  const labelX=left?18:blockX,labelY=y+53;
+  journeyText(ctx,step,labelX,labelY,8,color,"700",align);
+  journeyText(ctx,title,labelX,labelY+15,9,"#edf5f8","600",align);
+  journeyText(ctx,detail,labelX,labelY+29,7,"#a9bdc7","400",align);
 }
 
 function drawJourneyMobile(ctx,w,h,time,reduced){
-  ctx.save();ctx.scale(w/390,h/750);
-  const bg=ctx.createLinearGradient(0,0,390,750);
-  bg.addColorStop(0,"#f8fbfd");bg.addColorStop(1,"#edf3f6");
-  ctx.fillStyle=bg;ctx.fillRect(0,0,390,750);
+  ctx.save();ctx.scale(w/390,h/860);
+  journeyBackground(ctx,390,860);
   journeyPipe(ctx,true,time,reduced);
-  journeySmallStage(ctx,92,"left","TARGET","Clean, safe water","Quality matched to reuse","#2879c7","tank");
-  journeySmallStage(ctx,225,"right","03 · MONITOR","Measure & verify","Water quality stays on target","#6684a3","monitor");
-  journeySmallStage(ctx,365,"left","02 · TREAT","Membrane separation","Treatment selected for the task","#9a6840","membrane");
-  journeySmallStage(ctx,505,"right","01 · PLAN","Understand the feed","Analysis · objectives · constraints","#ad6245","plan");
-  journeyText(ctx,"SOURCE WATER · VARIABLE QUALITY",195,625,9,"#c94d48","700","center");
-  journeyText(ctx,"Select the right sources for the target",195,642,9,"#6a8598","400","center");
-  const items=[["Process","#c94d48"],["River","#2879c7"],["Aquifer","#6684a3"],["Fields / runoff","#9a6840"]];
-  items.forEach((item,i)=>{
-    const x=20+(i%2)*178,y=660+Math.floor(i/2)*38;
-    journeyBox(ctx,x,y,168,30,7,"rgba(255,255,255,.94)","#e0c4bd");
-    ctx.fillStyle=item[1];ctx.beginPath();ctx.arc(x+13,y+15,4,0,Math.PI*2);ctx.fill();
-    journeyText(ctx,item[0],x+25,y+19,9,"#566c79","600");
-  });
-  journeyText(ctx,"WATER MOVES UP TOWARD CLEAN WATER",195,737,8,"#6a8598","700","center");
+  const rows=[
+    {y:123,side:"left",step:"TARGET",title:"Clean, safe water",detail:"Company objective",color:"#4da9ef",kind:"tank"},
+    {y:280,side:"right",step:"03 · MONITOR",title:"Measure & verify",detail:"Confirm quality in use",color:"#74b7de",kind:"monitor"},
+    {y:440,side:"left",step:"02 · TREAT",title:"RCDT membrane train",detail:"Separate dissolved loads",color:"#bd8657",kind:"membrane"},
+    {y:597,side:"right",step:"01 · PLAN",title:"Understand the feed",detail:"Analysis · objectives",color:"#d29a6c",kind:"plan"},
+  ];
+  rows.forEach(row=>journeySmallStage(ctx,row.y,row.side,row.step,row.title,row.detail,row.color,row.kind));
+  journeySourceLandscape(ctx,103,688);
+  journeyText(ctx,"SOURCE WATER · VARIABLE QUALITY",195,839,8,"#ee746b","700","center");
+  journeyText(ctx,"Water flows up toward the clean target  ↑",195,853,7,"#a9bdc7","600","center");
   ctx.restore();
 }
 
@@ -2538,7 +2612,7 @@ function drawNeptuneJourney(time){
   if(!canvas)return;
   const width=canvas.parentElement.clientWidth||900;
   const vertical=width<700;
-  const height=vertical?Math.round(width*750/390):Math.max(360,Math.round(width*520/1200));
+  const height=vertical?Math.round(width*860/390):Math.max(410,Math.round(width*560/1200));
   const dpr=Math.min(window.devicePixelRatio||1,2);
   const cssHeight=`${height}px`;
   if(canvas.style.height!==cssHeight)canvas.style.height=cssHeight;
