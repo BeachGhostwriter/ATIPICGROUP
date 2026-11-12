@@ -3,3 +3,6 @@
 node_modules
 
 scripts/seed-neon.sql
+
+# personal documents (kept local, not deployed)
+Brand Assets/Bio/
