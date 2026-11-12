@@ -172,6 +172,179 @@ st.caption(
     "Node width = total flow through that unit. Link width = stream volume. "
     "Hover over a link for the exact flow and description."
 )
+
+st.markdown("""
+<style>
+.neptune-goal-flow {
+    --flow-blue: #2879c7;
+    --flow-brown: #9a6840;
+    --flow-red: #c94d48;
+    margin: 1.5rem 0 2rem;
+    padding: 1.5rem;
+    border: 1px solid #dce5ef;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fbff 0%, #fff 100%);
+}
+.neptune-goal-flow h3 { margin: 0 0 .4rem; color: #173a5e; }
+.neptune-goal-flow > p { margin: 0; color: #526579; }
+.neptune-flow-key {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+    margin: 1rem 0;
+    color: #526579;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.neptune-flow-key .planning { color: var(--flow-blue); }
+.neptune-flow-key .water-direction { color: var(--flow-red); }
+.neptune-flow-sequence {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: .45rem;
+}
+.neptune-flow-sequence::before {
+    position: absolute;
+    top: 50%;
+    right: 1.4rem;
+    left: 1.4rem;
+    height: 3px;
+    content: "";
+    background: linear-gradient(90deg, var(--flow-blue), #6684a3 32%, var(--flow-brown) 65%, var(--flow-red));
+    opacity: .55;
+}
+.neptune-flow-step {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid #dce5ef;
+    border-top: 4px solid var(--step-color);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(24, 55, 82, .06);
+}
+.neptune-flow-step.target { --step-color: var(--flow-blue); background: #f0f7ff; }
+.neptune-flow-step.polish { --step-color: #6684a3; }
+.neptune-flow-step.core { --step-color: var(--flow-brown); }
+.neptune-flow-step.prep { --step-color: #ad6245; }
+.neptune-flow-step.sources { --step-color: var(--flow-red); background: #fff7f5; }
+.neptune-flow-step small {
+    display: block;
+    margin-bottom: .4rem;
+    color: var(--step-color);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.neptune-flow-step strong { display: block; color: #173a5e; line-height: 1.3; }
+.neptune-flow-step p { margin: .4rem 0 0; color: #526579; font-size: .78rem; line-height: 1.5; }
+.neptune-source-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .65rem; }
+.neptune-source-list span {
+    padding: .25rem .5rem;
+    border-radius: 999px;
+    background: #fce8e4;
+    color: #8d3935;
+    font-size: .7rem;
+    font-weight: 600;
+}
+.neptune-flow-link {
+    position: relative;
+    display: flex;
+    flex: 0 0 2.25rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--flow-brown);
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+.neptune-flow-link::after {
+    position: absolute;
+    content: "";
+    width: .38rem;
+    height: .38rem;
+    border-radius: 50%;
+    background: var(--flow-red);
+    animation: neptune-flow-left 1.7s ease-in-out infinite;
+}
+@keyframes neptune-flow-left {
+    from { transform: translateX(.7rem); opacity: .25; }
+    55% { opacity: 1; }
+    to { transform: translateX(-.7rem); opacity: .25; }
+}
+@media (max-width: 760px) {
+    .neptune-flow-sequence { flex-direction: column; }
+    .neptune-flow-sequence::before {
+        top: 1.4rem;
+        right: auto;
+        bottom: 1.4rem;
+        left: 50%;
+        width: 3px;
+        height: auto;
+        background: linear-gradient(180deg, var(--flow-blue), #6684a3 32%, var(--flow-brown) 65%, var(--flow-red));
+    }
+    .neptune-flow-step { flex-basis: auto; }
+    .neptune-flow-link { flex-basis: 1.4rem; min-height: 1.4rem; transform: rotate(90deg); }
+    .neptune-flow-link::after { animation-name: neptune-flow-up; }
+    @keyframes neptune-flow-up {
+        from { transform: translateY(.45rem); opacity: .25; }
+        55% { opacity: 1; }
+        to { transform: translateY(-.45rem); opacity: .25; }
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .neptune-flow-link::after { animation: none; opacity: 0; }
+}
+</style>
+<section class="neptune-goal-flow" aria-labelledby="neptune-goal-flow-title">
+  <h3 id="neptune-goal-flow-title">Start with the water you need</h3>
+  <p>Set the company objective first, then work back from the required water quality to the treatment train and the water sources available.</p>
+  <div class="neptune-flow-key">
+    <span class="planning">Planning logic: target → treatment design → source analysis</span>
+    <span class="water-direction">Water flow: sources ← treatment ← clean water</span>
+  </div>
+  <div class="neptune-flow-sequence" role="img" aria-label="Goal-first water treatment flow: define the clean-water target, select polishing and core treatment, condition the feed, then identify process, river, aquifer, and agricultural runoff sources. Water flows from sources on the right toward clean water on the left.">
+    <div class="neptune-flow-step target">
+      <small>Company objective</small>
+      <strong>Clean water for reuse</strong>
+      <p>Define quality, volume and reliability targets.</p>
+    </div>
+    <span class="neptune-flow-link" aria-hidden="true">←</span>
+    <div class="neptune-flow-step polish">
+      <small>03 · Finish</small>
+      <strong>Final polishing</strong>
+      <p>Verify the water meets the intended use.</p>
+    </div>
+    <span class="neptune-flow-link" aria-hidden="true">←</span>
+    <div class="neptune-flow-step core">
+      <small>02 · Treat</small>
+      <strong>Core treatment</strong>
+      <p>Select processes for the key contaminants and recovery goals.</p>
+    </div>
+    <span class="neptune-flow-link" aria-hidden="true">←</span>
+    <div class="neptune-flow-step prep">
+      <small>01 · Understand</small>
+      <strong>Feed conditioning</strong>
+      <p>Use analysis to account for source quality and variability.</p>
+    </div>
+    <span class="neptune-flow-link" aria-hidden="true">←</span>
+    <div class="neptune-flow-step sources">
+      <small>Available water · original state</small>
+      <strong>Identify the sources</strong>
+      <div class="neptune-source-list">
+        <span>Process water</span><span>River</span><span>Aquifer</span><span>Fields / runoff</span>
+      </div>
+    </div>
+  </div>
+</section>
+""", unsafe_allow_html=True)
+
 st.divider()
 
 # ── Annual flow summary table ─────────────────────────────────────────────────
