@@ -146,6 +146,9 @@ canvas{display:block;}
 .removal-wrap{overflow-x:auto;}
 .removal-bar{height:8px;border-radius:2px;background:var(--green);}
 
+/* Neptune treatment-train scene (iframe; primary on Treatment Solutions, mirror on Sankey) */
+.train-embed{margin:0 0 24px;}
+.train-frame{display:block;width:100%;height:640px;border:0;border-radius:14px;background:transparent;}
 /* Neptune water-treatment journey canvas */
 .journey-graphic{--journey-blue:#4da9ef;--journey-brown:#bd8657;--journey-red:#ee625a;margin:18px 0 24px;background:#061019;border:1px solid #203442;border-radius:var(--radius);overflow:hidden;box-shadow:0 12px 36px rgba(6,16,25,.16);}
 .journey-graphic-head{padding:20px 24px 12px;}
@@ -351,6 +354,8 @@ canvas{display:block;}
       <span style="font-size:12px;color:var(--ink-3)">Based on highest contaminant concentrations in company data</span>
     </div>
     <div class="stage-grid" id="stageGrid"></div>
+    <div class="sec-head"><h2 class="sec-title">Treatment Train — Live Scene</h2><span class="sec-sub">Rebuilds with the technologies selected above · mirrored on the Sankey page</span></div>
+    <div class="train-embed"><iframe class="train-frame" id="trainFramePrimary" data-role="primary" src="/neptune-treatment-train.html" title="Animated treatment train for the selected technologies" loading="lazy"></iframe></div>
     <div class="sec-head"><h2 class="sec-title">Treatment Chain — Contaminant Removal</h2><span class="sec-sub">Removal efficiencies per stage for key parameters</span></div>
     <div class="tbl-wrap removal-wrap"><table class="dt" id="removalTable">
       <thead><tr><th>Stage</th><th>Technology</th><th>TSS</th><th>Oil/Grease</th><th>Fe</th><th>Zn</th><th>COD</th><th>BOD</th><th>Tier</th><th style="text-align:right">CAPEX (€M)</th><th style="text-align:right">OPEX (€/yr M)</th></tr></thead>
@@ -676,6 +681,8 @@ canvas{display:block;}
     <div class="chart-wrap" style="padding:24px 0;">
       <canvas id="sankeyCanvas" style="width:100%;display:block;"></canvas>
     </div>
+    <div class="sec-head"><h2 class="sec-title">Treatment Train — Mirror</h2><span class="sec-sub">Reproduces the selection on Treatment Solutions</span></div>
+    <div class="train-embed"><iframe class="train-frame" id="trainFrameMirror" data-role="mirror" src="/neptune-treatment-train.html?mode=mirror" title="Mirror of the treatment train selected on Treatment Solutions" loading="lazy"></iframe></div>
     <section class="journey-graphic" aria-labelledby="journeyTitle">
       <div class="journey-graphic-head">
         <h2 class="journey-graphic-title" id="journeyTitle">Start with the water you need</h2>

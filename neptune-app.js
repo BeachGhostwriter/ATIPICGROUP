@@ -668,7 +668,23 @@ function renderTreatment(){
   document.getElementById("txEnergy").innerHTML=(tx.total_energy_kwh_yr/1e6).toFixed(1)+"<span class='kpi-unit'>GWh/yr</span>";
   const active=Object.values(state.selected_treatments).filter(t=>t&&!t.includes("None")).length;
   document.getElementById("txStages").innerHTML=active+"<span class='kpi-unit'> stages</span>";
+  syncTreatmentTrain(trainFocusNext);trainFocusNext=false;
 }
+
+// ── Treatment-train scene (iframes): primary on Treatment Solutions, mirror on Sankey ──
+let trainFocusNext=false;   // set by onTechChange so the primary scene flies to the changed stage
+function trainFrames(){return[...document.querySelectorAll("iframe.train-frame")];}
+function postTrain(frame,focus){
+  if(!frame.contentWindow)return;
+  frame.contentWindow.postMessage({type:"neptune-train:set",sel:{...(state.selected_treatments||{})},focus:!!focus&&frame.dataset.role==="primary"},"*");
+}
+function syncTreatmentTrain(focus){trainFrames().forEach(f=>postTrain(f,focus));}
+window.addEventListener("message",e=>{
+  const frame=trainFrames().find(f=>f.contentWindow===e.source);
+  if(!frame||!e.data)return;
+  if(e.data.type==="neptune-train:ready")postTrain(frame,false);
+  else if(e.data.type==="neptune-train:height"&&e.data.h>0)frame.style.height=Math.round(e.data.h)+"px";
+});
 
 // Compute leak detection net savings (reused in EBITDA and dashboard)
 function leakDetectSavings(){
@@ -2179,6 +2195,7 @@ function renderSankey(){
   const d=buildSankeyData();
   setTimeout(()=>{
     drawSankey("sankeyCanvas",d);
+    syncTreatmentTrain(false);
     renderNeptuneJourney();
   },50);
 }
@@ -3054,6 +3071,7 @@ function onCountryChange(){
 function onTechChange(sel){
   const stage=sel.getAttribute("data-stage");
   state.selected_treatments[stage]=sel.value;
+  trainFocusNext=true;
   const t=TX[stage]?.[sel.value];
   const card=sel.parentElement;
   const desc=card.querySelector("div:last-child");
