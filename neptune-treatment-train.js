@@ -1332,6 +1332,7 @@ function rebuild(){
   if(gl)lineChunks.concat(meshChunks).forEach(function(c){if(c.vb){gl.deleteBuffer(c.vb);gl.deleteBuffer(c.ib);c.vb=null}});
   lineChunks.length=0;meshChunks.length=0;lv=[];ln=0;mvx=[];mix_=[];mn=0;
   buildScene();makeLabels();updatePanels();
+  try{document.dispatchEvent(new Event('journey:sel'))}catch(x){}
   if(gl&&!uploadScene()){gl=null;viz.classList.add('no-gl')}
   measureBands();measureLabels();lastStep=-1;update();if(!running)render(0);
 }
@@ -1372,6 +1373,8 @@ window.__journeySet=function(byName,focus){
   if(focus&&!playing&&changed.length===1)goTo(changed[0]+1);   /* one stage changed: the camera shows it */
 };
 window.__journeyPlaying=function(){return playing};
+window.__journeyGet=function(){var o={};Object.keys(STAGE_KEY).forEach(function(name){
+  var s=STAGES.filter(function(x){return x.key===STAGE_KEY[name]})[0];o[name]=s.opts[SEL[s.key]].n});return o};
 
 /* ---------- layout, copy and step dots ---------- */
 function resize(){
