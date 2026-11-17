@@ -1440,8 +1440,14 @@ function renderCompare(){
 // ── Results & Trends renderer ─────────────────────────────────────────────────
 
 let savedScenarios=[];
+let demoReadOnly=false;
 
 async function saveScenario(){
+  if(demoReadOnly){
+    const b=document.getElementById("trendsBanner");b.style.display="block";
+    b.textContent="Demo account (read-only): saving scenarios is disabled. Contact ATIPIC Group for your own Neptune login.";
+    return;
+  }
   const name=document.getElementById("scenarioName").value||`Scenario ${new Date().toLocaleDateString()}`;
   const costs=annualWaterCosts();
   const tx=treatmentCapexOpex();
@@ -3137,6 +3143,12 @@ async function init(){
       const short=data.email.split("@")[0];
       document.getElementById("uEmail").textContent=data.email;
       document.getElementById("uAv").textContent=short[0].toUpperCase();
+    }
+    if(data.demo||data.readOnly){
+      demoReadOnly=true;
+      document.getElementById("uRole").textContent="Demo · read-only";
+      const sb=document.getElementById("saveScenarioBtn");
+      if(sb){sb.disabled=true;sb.title="Saving is disabled for the demo account";sb.style.opacity=".5";sb.style.cursor="not-allowed";}
     }
     document.getElementById("authOverlay").style.display="none";
     showSec("dashboard");

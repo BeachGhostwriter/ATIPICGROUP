@@ -269,7 +269,7 @@ tr.sel td{background:var(--accent-lt);}
   <div class="sb-bottom">
     <div class="user-chip">
       <div class="u-av" id="uAv">A</div>
-      <div><div class="u-name" id="uEmail">—</div><div class="u-role">Neptune Platform</div></div>
+      <div><div class="u-name" id="uEmail">—</div><div class="u-role" id="uRole">Neptune Platform</div></div>
     </div>
     <button class="sign-out" onclick="signOut()">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5l3 3-3 3M7 8h7"/><path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h4"/></svg>
@@ -652,7 +652,7 @@ tr.sel td{background:var(--accent-lt);}
   <div class="topbar"><h1 class="pg-title">Results &amp; Trends</h1><span class="topbar-meta">Saved scenarios · historical analysis · time-series</span></div>
   <div class="content">
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
-      <button class="btn btn-primary" onclick="saveScenario()">💾 Save Current Scenario</button>
+      <button class="btn btn-primary" id="saveScenarioBtn" onclick="saveScenario()">💾 Save Current Scenario</button>
       <input type="text" id="scenarioName" placeholder="Scenario name (optional)" style="padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:13px;width:240px;">
       <button class="btn btn-ghost" onclick="loadTrends()">↻ Refresh</button>
     </div>

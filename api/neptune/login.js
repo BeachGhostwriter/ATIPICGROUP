@@ -1,4 +1,4 @@
-const { getPool, verifyPassword, signSession, SESSION_COOKIE, SESSION_TTL } = require('../../lib/neptune-auth');
+const { getPool, verifyPassword, signSession, isDemo, ensureDemoUser, SESSION_COOKIE, SESSION_TTL } = require('../../lib/neptune-auth');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
 
   try {
     const pool = getPool();
+    if (isDemo(email)) await ensureDemoUser(pool);
     const { rows } = await pool.query(
       'SELECT email, password_hash FROM neptune_users WHERE lower(email) = lower($1)',
       [email]
