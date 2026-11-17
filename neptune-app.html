@@ -317,26 +317,39 @@ tr.sel td{background:var(--accent-lt);}
     <div id="countryStressCard" class="info-banner"></div>
 
     <!-- Rainfall history, trend curve, extrapolation and stress test -->
-    <div class="sec-head"><h2 class="sec-title">Rainfall — Last 10 Years &amp; Trend</h2><span class="sec-sub">Open-Meteo historical archive (ERA5 reanalysis) · annual totals per calendar year</span></div>
+    <div class="sec-head"><h2 class="sec-title">Rainfall — Last 10 Years, Cycles &amp; Trend</h2><span class="sec-sub">Open-Meteo historical archive (ERA5 reanalysis) · 35-year record used to fit the 3-, 5- and 10-year cycles</span></div>
     <div class="form-grid-3">
       <div class="field"><label>City / Site</label><select id="rainCity" onchange="onRainCityChange()"></select></div>
       <div class="field"><label>Latitude</label><input type="number" id="rainLat" step="0.01" onchange="loadRainHistory()"></div>
       <div class="field"><label>Longitude</label><input type="number" id="rainLon" step="0.01" onchange="loadRainHistory()"></div>
     </div>
+    <div class="form-grid-3">
+      <div class="field"><label>Annual Chart Range</label><select id="rainRange" onchange="renderRainAnalysis()"><option value="10">Last 10 years + projection</option><option value="all">Full record (35 years) + projection</option></select></div>
+      <div class="field"><label>Heavy-Rain Frequency Trend (%/decade)</label><input type="number" id="rainXGrowth" step="1" min="-50" max="100" placeholder="auto" onchange="rainRebuild()"></div>
+      <div class="field"><label>Heavy-Rain Intensity Trend (%/decade)</label><input type="number" id="rainXInt" step="0.5" min="-10" max="30" value="1.4" onchange="rainRebuild()"></div>
+      <div class="field"><label>Cycle Periods (years, comma-separated)</label><input type="text" id="rainCycles" value="3, 5, 10" onchange="rainRebuild()"></div>
+    </div>
     <div class="info-banner" id="rainBanner">Select a country and city to load the rainfall history.</div>
     <div class="kpi-strip">
       <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="rk1">—</div><div class="kpi-lbl">10-yr Mean Rainfall</div></div>
       <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="rk2">—</div><div class="kpi-lbl">Driest / Wettest Year</div></div>
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="rk3">—</div><div class="kpi-lbl">Trend Slope (latest year)</div></div>
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="rk4">—</div><div class="kpi-lbl">Fit Quality (R²)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="rk3">—</div><div class="kpi-lbl">Heavy-Rain Days / yr · Trend</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="rk4">—</div><div class="kpi-lbl">Cycle Model Fit (R²)</div></div>
     </div>
     <div class="chart-wrap">
       <div class="rain-formula" id="rainFormula"></div>
-      <div class="chart-canvas-wrap" style="height:300px;"><canvas id="rainAnnualCanvas" role="img" aria-label="Annual rainfall histogram with fitted trend curve"></canvas></div>
+      <div class="chart-canvas-wrap" style="height:300px;"><canvas id="rainAnnualCanvas" role="img" aria-label="Annual rainfall histogram with fitted cycle model"></canvas></div>
       <div class="chart-legend" id="rainAnnualLegend"></div>
     </div>
 
-    <div class="sec-head"><h2 class="sec-title">Daily Rainfall vs Trend — 5-Year Extrapolation &amp; Stress Test</h2><span class="sec-sub">30-day rolling rainfall, shaded above / below the seasonal trend curve · scenarios projected 5 years ahead</span></div>
+    <div class="sec-head"><h2 class="sec-title">Heavy-Rain Days — Frequency Trend</h2><span class="sec-sub">Days above the record's 95th percentile of wet-day rainfall · Poisson trend · projected frequency</span></div>
+    <div class="chart-wrap">
+      <div class="rain-formula" id="rainXNote"></div>
+      <div class="chart-canvas-wrap" style="height:240px;"><canvas id="rainXCanvas" role="img" aria-label="Heavy-rain days per year with trend and projection"></canvas></div>
+      <div class="chart-legend" id="rainXLegend"></div>
+    </div>
+
+    <div class="sec-head"><h2 class="sec-title">Daily Rainfall vs Trend — 5-Year Extrapolation &amp; Stress Test</h2><span class="sec-sub">30-day rolling rainfall vs the cycle-trend curve · projection rebuilt from analogue years, cycles and rising heavy-rain frequency</span></div>
     <div class="chart-wrap">
       <div class="chart-canvas-wrap" style="height:340px;"><canvas id="rainDailyCanvas" role="img" aria-label="Daily rainfall above and below trend with five-year scenario projection"></canvas></div>
       <div class="chart-legend" id="rainDailyLegend"></div>
