@@ -220,15 +220,18 @@ TREATMENT_OPTIONS = {
             "water_recovery": 0.95,
             "tier": "High Concentration",
         },
-        "Crystallization": {
-            "description": "Salt and mineral recovery from high-TDS concentrate. ZLD endpoint.",
-            "capex_eur_per_m3h": 200_000,
-            "opex_eur_per_m3": 1.20,
-            "energy_kwh_m3": 15.00,
-            "water_recovery": 0.99,
-            "tier": "ZLD Endpoint",
+        "BrineX Membrane + Thermal": {
+            "description": "Membrane pre-concentration ahead of a smaller thermal stage: ~40 % less evaporation energy than MEE alone.",
+            "capex_eur_per_m3h": 170_000,
+            "opex_eur_per_m3": 0.70,
+            "energy_kwh_m3": 4.80,
+            "water_recovery": 0.95,
+            "tier": "Energy-Optimised",
         },
     },
+    # Fix B (ZLD double count): ZLD is only the end point after Concentrate Management. Multi-stage RO is the
+    # tertiary stage and the brine concentrator / thermal step is Concentrate Management, so they are not
+    # charged again here. The crystallizer is sized on the residue: concentrate flow x (1 - CM water_recovery).
     "ZLD (Zero Liquid Discharge)": {
         "None (no ZLD)": {
             "description": "Discharge treated effluent to river within permit limits.",
@@ -238,21 +241,13 @@ TREATMENT_OPTIONS = {
             "water_recovery": 0.0,
             "tier": "Standard Discharge",
         },
-        "BrineX Pre-Concentration Stages": {
-            "description": "Membrane pre-concentration reduces thermal evaporation energy by ~40 %.",
-            "capex_eur_per_m3h": 250_000,
-            "opex_eur_per_m3": 1.80,
-            "energy_kwh_m3": 12.00,
-            "water_recovery": 0.97,
-            "tier": "Optimised ZLD",
-        },
-        "Multi-stage RO + Brine Concentrator + Thermal + Crystallizer": {
-            "description": "Industry-standard ZLD architecture. Highest water recovery, highest cost.",
-            "capex_eur_per_m3h": 400_000,
-            "opex_eur_per_m3": 2.50,
-            "energy_kwh_m3": 20.00,
+        "Crystallizer": {
+            "description": "Turns the residual brine left by Concentrate Management into solid salts plus distillate.",
+            "capex_eur_per_m3h": 200_000,
+            "opex_eur_per_m3": 1.20,
+            "energy_kwh_m3": 15.00,
             "water_recovery": 0.99,
-            "tier": "Full ZLD",
+            "tier": "ZLD Endpoint",
         },
     },
 }

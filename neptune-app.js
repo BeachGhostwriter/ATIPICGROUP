@@ -26,22 +26,36 @@ const TX = {
     "Activated Carbon + UV":                      {desc:"Polishing for micropollutants, colour, odour.",capex:20000,opex:0.12,energy:0.15,removal:{Micro:0.95,Bacteria:0.9999,COD:0.60},tier:"Polishing"},
     "Ion Exchange / Electrodialysis":             {desc:"Selective ion removal. Ideal for Zn, Fe, heavy metals.",capex:40000,opex:0.20,energy:0.40,removal:{HM:0.95,Zn:0.99,Fe:0.95,TDS:0.50},tier:"Selective"},
   },
+  // water_recovery: share of the concentrate returned as water; the rest is the residue a ZLD end point receives
   "Concentrate Management": {
-    "Brine Concentration (Membrane)":            {desc:"Membrane pre-concentration before thermal.",capex:80000,opex:0.40,energy:1.20,tier:"Standard ZLD Step"},
-    "Electrodialysis":                            {desc:"Energy-efficient for moderate salinity.",capex:70000,opex:0.35,energy:0.90,tier:"Energy Efficient"},
-    "MEE / Thermal Evaporation (MVR)":            {desc:"Multi-effect evaporation with MVR.",capex:150000,opex:0.80,energy:8.00,tier:"High Concentration"},
+    "Brine Concentration (Membrane)":            {desc:"Membrane pre-concentration before thermal.",capex:80000,opex:0.40,energy:1.20,water_recovery:0.85,tier:"Standard ZLD Step"},
+    "Electrodialysis":                            {desc:"Energy-efficient for moderate salinity.",capex:70000,opex:0.35,energy:0.90,water_recovery:0.80,tier:"Energy Efficient"},
+    "MEE / Thermal Evaporation (MVR)":            {desc:"Multi-effect evaporation with MVR.",capex:150000,opex:0.80,energy:8.00,water_recovery:0.95,tier:"High Concentration"},
+    "BrineX Membrane + Thermal":                  {desc:"Membrane pre-concentration ahead of a smaller thermal stage: ~40% less evaporation energy than MEE alone.",capex:170000,opex:0.70,energy:4.80,water_recovery:0.95,tier:"Energy-Optimised"},
   },
   "ZLD (Zero Liquid Discharge)": {
     "None (no ZLD)":                              {desc:"Discharge treated effluent within permit limits.",capex:0,opex:0,energy:0,tier:"Standard Discharge"},
-    "BrineX Pre-Concentration Stages":            {desc:"Membrane pre-concentration reduces thermal energy ~40%.",capex:250000,opex:1.80,energy:12.0,tier:"Optimised ZLD"},
-    "Full ZLD Train":                             {desc:"Multi-stage RO + brine concentrator + thermal. Highest recovery.",capex:400000,opex:2.50,energy:20.0,tier:"Full ZLD"},
+    // Fix B: ZLD is only the end point after concentrate management (RO = tertiary, brine concentrator / thermal = concentrate
+    // management), sized on the residue concentrate management leaves behind: concentrate flow × (1 − its water recovery).
+    "Crystallizer":                               {desc:"Turns the residual brine into solid salts plus distillate. Sized on the residue only.",capex:200000,opex:1.20,energy:15.0,water_recovery:0.99,tier:"ZLD Endpoint"},
   },
 };
 
 const STAGE_FLOW_KEY = {
   "Pre-treatment":"pretreatment","Primary Treatment":"wwt","Secondary Treatment":"wwt",
-  "Tertiary Treatment":"wwt","Concentrate Management":"concentrate","ZLD (Zero Liquid Discharge)":"concentrate",
+  "Tertiary Treatment":"wwt","Concentrate Management":"concentrate","ZLD (Zero Liquid Discharge)":"zld_residue",
 };
+
+// Design flow (m³/h) a stage is sized on. ZLD only receives what concentrate management leaves behind.
+function stageDesignFlow(stage,sel){
+  const fk=STAGE_FLOW_KEY[stage]||"wwt";
+  if(fk==="zld_residue"){
+    const cm=TX["Concentrate Management"][(sel||state.selected_treatments||{})["Concentrate Management"]];
+    return state.concentrate_flow_m3h*(1-(cm?.water_recovery||0));
+  }
+  return {pretreatment:state.pretreatment_flow_m3h,wwt:state.wwt_flow_m3h,concentrate:state.concentrate_flow_m3h}[fk];
+}
+
 
 const DEFAULT_PROCESSES = {
   "Purification":  {flow_in:2764.30,flow_out:2764.30,leakage:0.00},
@@ -171,19 +185,13 @@ function treatmentCapexOpex() {
   if(!state.selected_treatments) return {total_capex_eur:0,total_opex_eur_yr:0,total_energy_kwh_yr:0,detail:{}};
   const hrs  = state.operating_hours;
   const tot  = state.total_inlet_flow;
-  const flows = {
-    pretreatment: state.pretreatment_flow_m3h,
-    wwt:          state.wwt_flow_m3h,
-    concentrate:  state.concentrate_flow_m3h,
-  };
   let totalCapex=0, totalOpex=0, totalEnergy=0;
   const detail={};
   for(const [stage,tech] of Object.entries(state.selected_treatments)){
     if(!tech||tech.includes("None"))continue;
     const opts=TX[stage];if(!opts||!opts[tech])continue;
     const t=opts[tech];
-    const fk=STAGE_FLOW_KEY[stage]||"wwt";
-    const flow=flows[fk];
+    const flow=stageDesignFlow(stage);
     const capex=t.capex*flow;
     const opex_yr=t.opex*flow*hrs;
     const energy_yr=t.energy*flow*hrs;
@@ -590,6 +598,14 @@ function renderCountry(){
     tr.innerHTML=`<td>${param}</td><td class="td-num">${val}</td><td>${LIMIT_UNITS[param]||""}</td><td style="color:var(--ink-3);font-size:11.5px">${LIMIT_NOTES[param]||""}</td>`;
     tbody.appendChild(tr);
   }
+  // merged page: EEA WEI+ overview, rainfall history / trend / stress test
+  renderEEA();
+  document.querySelectorAll("#weiChart .wei-row").forEach(r=>r.classList.toggle("sel",r.querySelector(".wei-country")?.textContent===c));
+  document.querySelectorAll("#eeaTbody tr").forEach(r=>r.classList.toggle("sel",r.cells[0]?.textContent===c));
+  if(typeof populateRainCities==="function"){
+    if(renderCountry._rainFor!==c){renderCountry._rainFor=c;populateRainCities();}
+    else setTimeout(renderRainAnalysis,0);
+  }
 }
 
 function renderCompany(){
@@ -646,8 +662,7 @@ function renderTreatment(){
     const tech=state.selected_treatments[stage];
     if(!tech||tech.includes("None"))continue;
     const t=TX[stage]?.[tech];if(!t)continue;
-    const fk=STAGE_FLOW_KEY[stage]||"wwt";
-    const flow={pretreatment:state.pretreatment_flow_m3h,wwt:state.wwt_flow_m3h,concentrate:state.concentrate_flow_m3h}[fk];
+    const flow=stageDesignFlow(stage);
     const capexM=(t.capex*flow/1e6).toFixed(2);
     const opexM=(t.opex*flow*state.operating_hours/1e6).toFixed(2);
     const rem=t.removal||{};
@@ -815,8 +830,7 @@ function renderCapex(){
   for(const[stage,tech] of Object.entries(state.selected_treatments)){
     if(!tech||tech.includes("None"))continue;
     const t=TX[stage]?.[tech];if(!t)continue;
-    const fk=STAGE_FLOW_KEY[stage]||"wwt";
-    const flow={pretreatment:state.pretreatment_flow_m3h,wwt:state.wwt_flow_m3h,concentrate:state.concentrate_flow_m3h}[fk];
+    const flow=stageDesignFlow(stage);
     const sc=t.capex*flow;
     const stageNpv=npvCalc(capexSched.map(c=>c*(sc/Math.max(totalCapex,1))),annualBenefit*(sc/Math.max(totalCapex,1)),0,state.discount_rate_pct);
     optRows.push({stage,tech,tier:t.tier,capexM:sc/1e6,npvM:stageNpv/1e6,ratio:stageNpv/Math.max(sc,1)});
@@ -1346,7 +1360,7 @@ const SCENARIOS={
   },
   Advanced:{
     label:"Advanced",color:"#2ea44f",recycleRate:90,horizon:5,
-    treatments:{"Pre-treatment":"Ultrafiltration (UF)","Primary Treatment":"MBR (Primary)","Secondary Treatment":"AnMBR (Anaerobic MBR)","Tertiary Treatment":"NF / RO","Concentrate Management":"MEE / Thermal Evaporation (MVR)","ZLD (Zero Liquid Discharge)":"BrineX Pre-Concentration Stages"},
+    treatments:{"Pre-treatment":"Ultrafiltration (UF)","Primary Treatment":"MBR (Primary)","Secondary Treatment":"AnMBR (Anaerobic MBR)","Tertiary Treatment":"NF / RO","Concentrate Management":"BrineX Membrane + Thermal","ZLD (Zero Liquid Discharge)":"Crystallizer"},
   },
 };
 
@@ -3059,12 +3073,13 @@ function showSec(id){
     case"leakdetect":renderLeakDetect();break;
     case"heatmap":renderHeatMap();break;
     case"scada":renderSCADA();break;
-    case"eea":renderEEA();break;
+    case"eea":showSec("country");document.getElementById("eeaBlock")?.scrollIntoView({behavior:"smooth"});break;
   }
 }
 
 function onCountryChange(){
   state.selected_country=document.getElementById("cntrySelect").value;
+  if(typeof rainElastManual!=="undefined")rainElastManual=false;
   renderCountry();
 }
 

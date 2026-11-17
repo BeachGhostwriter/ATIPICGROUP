@@ -9,7 +9,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.data_models import TREATMENT_OPTIONS
-from utils.calculations import recommend_treatments, treatment_capex_opex
+from utils.calculations import recommend_treatments, treatment_capex_opex, zld_design_flow
 
 st.set_page_config(page_title="Treatment Solutions | Neptune", layout="wide")
 
@@ -317,8 +317,8 @@ STAGE_INFO = {
         "contams":   "TDS, Zn, Fe, Salts",
     },
     "ZLD (Zero Liquid Discharge)": {
-        "purpose":   "Eliminate liquid discharge entirely — maximum water recovery.",
-        "flow_note": f"Design flow: {conc_flow:,.0f} m3/h (brine)",
+        "purpose":   "End point after Concentrate Management: discharge the residue, or crystallize it to solid salts + distillate.",
+        "flow_note": "Design flow: residual brine after Concentrate Management (concentrate flow x (1 - its water recovery))",
         "contams":   "All remaining dissolved solids",
     },
 }
@@ -351,7 +351,8 @@ for stage, info in STAGE_INFO.items():
             flow_key_map = {
                 "Pre-treatment": pt_flow, "Primary Treatment": wwt_flow,
                 "Secondary Treatment": wwt_flow, "Tertiary Treatment": wwt_flow,
-                "Concentrate Management": conc_flow, "ZLD (Zero Liquid Discharge)": conc_flow,
+                "Concentrate Management": conc_flow,
+                "ZLD (Zero Liquid Discharge)": zld_design_flow(conc_flow, selected, TREATMENT_OPTIONS),
             }
             design_flow = flow_key_map.get(stage, wwt_flow)
             capex = tech.get("capex_eur_per_m3h", 0) * design_flow
@@ -499,7 +500,8 @@ for tech_name, tech in TREATMENT_OPTIONS[compare_stage].items():
     flow_map2 = {
         "Pre-treatment": pt_flow, "Primary Treatment": wwt_flow,
         "Secondary Treatment": wwt_flow, "Tertiary Treatment": wwt_flow,
-        "Concentrate Management": conc_flow, "ZLD (Zero Liquid Discharge)": conc_flow,
+        "Concentrate Management": conc_flow,
+        "ZLD (Zero Liquid Discharge)": zld_design_flow(conc_flow, selected, TREATMENT_OPTIONS),
     }
     df2 = flow_map2.get(compare_stage, wwt_flow)
     comp_rows.append({

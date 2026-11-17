@@ -32,8 +32,15 @@ STAGE_FLOW_KEY = {
     "Secondary Treatment":        "wwt",
     "Tertiary Treatment":         "wwt",
     "Concentrate Management":     "concentrate",
-    "ZLD (Zero Liquid Discharge)": "concentrate",
+    "ZLD (Zero Liquid Discharge)": "zld_residue",    # sized on what Concentrate Management leaves (Fix B)
 }
+
+
+def zld_design_flow(conc_flow: float, selected_treatments: dict, treatment_options: dict) -> float:
+    """Residual brine reaching the ZLD end point: conc_flow x (1 - water recovery of the chosen CM technology)."""
+    cm = treatment_options.get("Concentrate Management", {}).get(
+        (selected_treatments or {}).get("Concentrate Management"), {})
+    return conc_flow * (1.0 - cm.get("water_recovery", 0.0))
 
 def treatment_capex_opex(selected_treatments: dict, treatment_options: dict,
                           total_flow_m3h: float, hours: float,
@@ -49,6 +56,7 @@ def treatment_capex_opex(selected_treatments: dict, treatment_options: dict,
         "pretreatment": pt_flow,
         "wwt":          ww_flow,
         "concentrate":  conc_flow,
+        "zld_residue":  zld_design_flow(conc_flow, selected_treatments, treatment_options),
     }
 
     total_capex = 0.0

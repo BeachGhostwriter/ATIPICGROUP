@@ -146,6 +146,23 @@ canvas{display:block;}
 .removal-wrap{overflow-x:auto;}
 .removal-bar{height:8px;border-radius:2px;background:var(--green);}
 
+/* rainfall trend & stress test */
+.rain-formula{font-size:12.5px;color:var(--ink-2);padding:0 4px 10px;line-height:1.7;}
+.rain-formula code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink);background:var(--accent-lt);padding:2px 6px;border-radius:4px;}
+.rain-method{font-size:12px;color:var(--ink-2);line-height:1.65;margin:0 0 12px;padding:10px 14px;border-left:3px solid var(--accent);background:var(--surface);border-radius:var(--radius);}
+.rain-method code{font-family:ui-monospace,Consolas,monospace;color:var(--ink);}
+.chart-legend{display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 4px 0;font-size:11.5px;color:var(--ink-2);}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px;}
+.chart-legend i{display:inline-block;width:18px;height:0;border-top:2px solid;}
+.chart-legend i.sw{height:10px;width:12px;border:0;border-radius:2px;}
+.chart-legend i.dash{border-top-style:dashed;}
+.rain-tip{position:fixed;z-index:500;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11.5px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.14);display:none;min-width:150px;}
+.rain-tip b{display:block;margin-bottom:2px;}
+.rain-tip .r{display:flex;justify-content:space-between;gap:14px;}
+.rain-tip .r em{font-style:normal;display:inline-flex;align-items:center;gap:5px;color:var(--ink-2);}
+.rain-tip .r em i{display:inline-block;width:8px;height:8px;border-radius:2px;}
+.wei-row.sel .wei-country{font-weight:700;color:var(--accent);}
+tr.sel td{background:var(--accent-lt);}
 /* Neptune treatment-train scene (iframe; primary on Treatment Solutions, mirror on Sankey) */
 .train-embed{margin:0 0 24px;}
 .train-frame{display:block;width:100%;height:640px;border:0;border-radius:14px;background:transparent;}
@@ -186,7 +203,7 @@ canvas{display:block;}
     <div class="nav-label">Configuration</div>
     <a class="nav-item" data-sec="country" href="#" onclick="showSec('country');return false;">
       <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M2.5 8h11M8 2.5C6.5 5 6.5 11 8 13.5M8 2.5C9.5 5 9.5 11 8 13.5"/></svg>
-      Country &amp; Region
+      Country &amp; Water Stress
     </a>
     <a class="nav-item" data-sec="company" href="#" onclick="showSec('company');return false;">
       <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M5 5V3a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M8 9v2"/></svg>
@@ -248,10 +265,6 @@ canvas{display:block;}
       <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="10" rx="1"/><path d="M4 12v2M12 12v2M4 14h8"/><path d="M4 7l2-2 2 3 2-4 2 2"/></svg>
       SCADA Analysis
     </a>
-    <a class="nav-item" data-sec="eea" href="#" onclick="showSec('eea');return false;">
-      <svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V6l4-4h8v12H2z"/><path d="M6 2v4H2"/></svg>
-      EEA Water Stress
-    </a>
   </nav>
   <div class="sb-bottom">
     <div class="user-chip">
@@ -292,7 +305,7 @@ canvas{display:block;}
 
 <!-- ═══ COUNTRY & REGION ═══════════════════════════════════════════════════ -->
 <div id="sec-country" class="section hidden">
-  <div class="topbar"><h1 class="pg-title">Country &amp; Region</h1><span class="topbar-meta">Water stress, climate risk &amp; regulatory discharge limits</span></div>
+  <div class="topbar"><h1 class="pg-title">Country, Region &amp; Water Stress</h1><span class="topbar-meta">Water stress, rainfall trend &amp; stress test, discharge limits · EEA WEI+ overview</span></div>
   <div class="content">
     <div class="form-grid-3">
       <div class="field"><label>Country</label>
@@ -302,11 +315,85 @@ canvas{display:block;}
       <div class="field"><label>Discharge Permit Cost (€/m³)</label><input type="number" id="dCost" step="0.01" min="0" value="0.45" onchange="state.discharge_cost_eur_m3=+this.value;refreshAll();"></div>
     </div>
     <div id="countryStressCard" class="info-banner"></div>
+
+    <!-- Rainfall history, trend curve, extrapolation and stress test -->
+    <div class="sec-head"><h2 class="sec-title">Rainfall — Last 10 Years &amp; Trend</h2><span class="sec-sub">Open-Meteo historical archive (ERA5 reanalysis) · annual totals per calendar year</span></div>
+    <div class="form-grid-3">
+      <div class="field"><label>City / Site</label><select id="rainCity" onchange="onRainCityChange()"></select></div>
+      <div class="field"><label>Latitude</label><input type="number" id="rainLat" step="0.01" onchange="loadRainHistory()"></div>
+      <div class="field"><label>Longitude</label><input type="number" id="rainLon" step="0.01" onchange="loadRainHistory()"></div>
+    </div>
+    <div class="info-banner" id="rainBanner">Select a country and city to load the rainfall history.</div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val" id="rk1">—</div><div class="kpi-lbl">10-yr Mean Rainfall</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s2)"></div><div class="kpi-val" id="rk2">—</div><div class="kpi-lbl">Driest / Wettest Year</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val" id="rk3">—</div><div class="kpi-lbl">Trend Slope (latest year)</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--blue)"></div><div class="kpi-val" id="rk4">—</div><div class="kpi-lbl">Fit Quality (R²)</div></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="rain-formula" id="rainFormula"></div>
+      <div class="chart-canvas-wrap" style="height:300px;"><canvas id="rainAnnualCanvas" role="img" aria-label="Annual rainfall histogram with fitted trend curve"></canvas></div>
+      <div class="chart-legend" id="rainAnnualLegend"></div>
+    </div>
+
+    <div class="sec-head"><h2 class="sec-title">Daily Rainfall vs Trend — 5-Year Extrapolation &amp; Stress Test</h2><span class="sec-sub">30-day rolling rainfall, shaded above / below the seasonal trend curve · scenarios projected 5 years ahead</span></div>
+    <div class="chart-wrap">
+      <div class="chart-canvas-wrap" style="height:340px;"><canvas id="rainDailyCanvas" role="img" aria-label="Daily rainfall above and below trend with five-year scenario projection"></canvas></div>
+      <div class="chart-legend" id="rainDailyLegend"></div>
+    </div>
+
+    <div class="sec-head"><h2 class="sec-title">Stress Test — Required Water Recycling</h2><span class="sec-sub">Freshwater availability under each rainfall scenario → recycling rate needed to keep production supplied</span></div>
+    <div class="form-grid-3">
+      <div class="field"><label>Current Recycling Rate (%)</label><input type="number" id="rainR0" value="10" step="1" min="0" max="95" onchange="renderRainAnalysis()"></div>
+      <div class="field"><label>Stress Elasticity (auto from country)</label><input type="number" id="rainElast" step="0.05" min="0.5" max="5" onchange="rainElastManual=true;renderRainAnalysis()"></div>
+      <div class="field"><label>Neptune Target Recycling (%)</label><input type="number" id="rainTarget" step="5" min="0" max="95" onchange="state.target_recycle_pct=+this.value;renderRainAnalysis()"></div>
+    </div>
+    <div class="rain-method" id="rainMethod"></div>
+    <div class="chart-wrap">
+      <div class="chart-canvas-wrap" style="height:260px;"><canvas id="rainRecycleCanvas" role="img" aria-label="Required recycling rate per scenario for the next five years"></canvas></div>
+      <div class="chart-legend" id="rainRecycleLegend"></div>
+    </div>
+    <div class="tbl-wrap"><table class="dt"><thead id="rainStressHead"></thead><tbody id="rainStressTbody"></tbody></table></div>
+
     <div class="sec-head"><h2 class="sec-title">Regulatory Discharge Limits</h2><span class="sec-sub" id="limitsSub"></span></div>
     <div class="tbl-wrap"><table class="dt" id="limitsTable">
       <thead><tr><th>Parameter</th><th>Limit</th><th>Unit</th><th>Notes</th></tr></thead>
       <tbody id="limitsTbody"></tbody>
     </table></div>
+
+    <!-- European water stress (EEA), formerly a separate page -->
+    <div id="eeaBlock" class="sec-head" style="margin-top:32px;"><h2 class="sec-title">European Water Stress — EEA Overview</h2><span class="sec-sub">Source: <a href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111</a> · WEI+ · Latest available</span></div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s1)"></div><div class="kpi-val">8<span class="kpi-unit"> countries</span></div><div class="kpi-lbl">Above 20% water scarcity threshold</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val">11<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU population in water-scarce areas</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--s4)"></div><div class="kpi-val">−18<span class="kpi-unit">%</span></div><div class="kpi-lbl">Freshwater abstractions since 2000</div></div>
+      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val">12<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU average WEI+</div></div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Water Exploitation Index Plus by Country</h2><span class="sec-sub">WEI+ = annual abstractions ÷ long-term renewable freshwater · Threshold: 20%</span></div>
+    <div class="wei-chart"><div id="weiChart"></div>
+      <div class="wei-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s1)"></div>Severe (&gt;40%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s2)"></div>High (20–40%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s3)"></div>Moderate (15–20%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s4)"></div>Low (5–15%)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s5)"></div>Minimal (&lt;5%)</div>
+      </div>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Country Detail</h2><span class="sec-sub">Sorted by WEI+ descending</span></div>
+    <div class="two-col">
+      <div class="tbl-wrap"><table class="dt"><thead><tr><th>Country</th><th style="text-align:right">WEI+</th><th>Stress Level</th><th>Primary Pressure</th></tr></thead><tbody id="eeaTbody"></tbody></table></div>
+      <div class="sector-panel">
+        <div class="sector-title">Water Use by Sector — Europe</div>
+        <canvas id="sectorCanvas" width="264" height="180"></canvas>
+        <div class="sector-list" id="sectorList"></div>
+        <p style="font-size:10px;color:var(--ink-3);margin-top:14px;line-height:1.5">Energy dominates via thermal power cooling. Agriculture drives stress in southern regions. Source: EEA Waterbase / Eurostat.</p>
+      </div>
+    </div>
+    <div class="src-footer">
+      <span class="src-label">Sources</span>
+      <a class="src-link" href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111 — Freshwater Resources in Europe</a>
+      <a class="src-link" href="https://water.europa.eu/freshwater" target="_blank" rel="noopener">EEA WISE</a>
+    </div>
   </div>
 </div>
 
@@ -436,45 +523,6 @@ canvas{display:block;}
 </div>
 
 <!-- ═══ EEA WATER STRESS ═══════════════════════════════════════════════════ -->
-<div id="sec-eea" class="section hidden">
-  <div class="topbar">
-    <h1 class="pg-title">European Water Stress — EEA Overview</h1>
-    <span class="topbar-meta">Source: <a href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111</a> · WEI+ · Latest available</span>
-  </div>
-  <div class="content">
-    <div class="kpi-strip">
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--s1)"></div><div class="kpi-val">8<span class="kpi-unit"> countries</span></div><div class="kpi-lbl">Above 20% water scarcity threshold</div></div>
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--s3)"></div><div class="kpi-val">11<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU population in water-scarce areas</div></div>
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--s4)"></div><div class="kpi-val">−18<span class="kpi-unit">%</span></div><div class="kpi-lbl">Freshwater abstractions since 2000</div></div>
-      <div class="kpi"><div class="kpi-stripe" style="background:var(--accent)"></div><div class="kpi-val">12<span class="kpi-unit">%</span></div><div class="kpi-lbl">EU average WEI+</div></div>
-    </div>
-    <div class="sec-head"><h2 class="sec-title">Water Exploitation Index Plus by Country</h2><span class="sec-sub">WEI+ = annual abstractions ÷ long-term renewable freshwater · Threshold: 20%</span></div>
-    <div class="wei-chart"><div id="weiChart"></div>
-      <div class="wei-legend">
-        <div class="leg-item"><div class="leg-dot" style="background:var(--s1)"></div>Severe (&gt;40%)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--s2)"></div>High (20–40%)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--s3)"></div>Moderate (15–20%)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--s4)"></div>Low (5–15%)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--s5)"></div>Minimal (&lt;5%)</div>
-      </div>
-    </div>
-    <div class="sec-head"><h2 class="sec-title">Country Detail</h2><span class="sec-sub">Sorted by WEI+ descending</span></div>
-    <div class="two-col">
-      <div class="tbl-wrap"><table class="dt"><thead><tr><th>Country</th><th style="text-align:right">WEI+</th><th>Stress Level</th><th>Primary Pressure</th></tr></thead><tbody id="eeaTbody"></tbody></table></div>
-      <div class="sector-panel">
-        <div class="sector-title">Water Use by Sector — Europe</div>
-        <canvas id="sectorCanvas" width="264" height="180"></canvas>
-        <div class="sector-list" id="sectorList"></div>
-        <p style="font-size:10px;color:var(--ink-3);margin-top:14px;line-height:1.5">Energy dominates via thermal power cooling. Agriculture drives stress in southern regions. Source: EEA Waterbase / Eurostat.</p>
-      </div>
-    </div>
-    <div class="src-footer">
-      <span class="src-label">Sources</span>
-      <a class="src-link" href="https://www.eea.europa.eu/en/analysis/indicators/use-of-freshwater-resources-in" target="_blank" rel="noopener">EEA IND-111 — Freshwater Resources in Europe</a>
-      <a class="src-link" href="https://water.europa.eu/freshwater" target="_blank" rel="noopener">EEA WISE</a>
-    </div>
-  </div>
-</div>
 
 <!-- ═══ PROCESS KINETICS (ASM1) ════════════════════════════════════════════ -->
 <div id="sec-kinetics" class="section hidden">
@@ -776,5 +824,6 @@ canvas{display:block;}
 </div><!-- /main -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="/neptune-app.js"></script>
+<script src="/neptune-rainfall.js"></script>
 </body>
 </html>

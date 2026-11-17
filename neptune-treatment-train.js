@@ -201,12 +201,12 @@ var STAGES=[
  {key:'cm',name:'Concentrate Management',st:5,opts:[
    {n:'Brine Concentration (Membrane)',sh:'Membrane brine concentration',tier:'Standard ZLD Step',capex:80000,rem:{},d:'Membrane pre-concentration before thermal.'},
    {n:'Electrodialysis',sh:'Electrodialysis',tier:'Energy Efficient',capex:70000,rem:{},d:'Energy-efficient for moderate salinity.'},
-   {n:'MEE / Thermal Evaporation (MVR)',sh:'MEE / MVR evaporation',tier:'High Concentration',capex:150000,rem:{},d:'Multi-effect evaporation with MVR.'}]},
+   {n:'MEE / Thermal Evaporation (MVR)',sh:'MEE / MVR evaporation',tier:'High Concentration',capex:150000,rem:{},d:'Multi-effect evaporation with MVR.'},
+   {n:'BrineX Membrane + Thermal',sh:'BrineX membrane + thermal',tier:'Energy-Optimised',capex:170000,rem:{},d:'Membrane pre-concentration ahead of a smaller thermal stage: ~40% less evaporation energy than MEE alone.'}]},
  {key:'zld',name:'ZLD (Zero Liquid Discharge)',st:6,opts:[
    {n:'None (no ZLD)',sh:'No ZLD',tier:'Standard Discharge',capex:0,rem:{},d:'Discharge treated effluent within permit limits.'},
-   {n:'BrineX Pre-Concentration Stages',sh:'BrineX pre-concentration',tier:'Optimised ZLD',capex:250000,rem:{},d:'Membrane pre-concentration reduces thermal energy ~40%.'},
-   {n:'Full ZLD Train',sh:'Full ZLD train',tier:'Full ZLD',capex:400000,rem:{},d:'Multi-stage RO + brine concentrator + thermal. Highest recovery.'}]}];
-var SEL={pre:2,pri:1,sec:3,ter:0,cm:2,zld:2};
+   {n:'Crystallizer',sh:'Crystallizer',tier:'ZLD Endpoint',capex:200000,rem:{},d:'Turns the residual brine left by concentrate management into solid salts plus distillate. Sized on the residue only.'}]}];
+var SEL={pre:2,pri:1,sec:3,ter:0,cm:2,zld:1};
 var STATION_NAMES=['Pre-treatment','Primary treatment','Secondary treatment','Tertiary treatment','Polishing & split','Concentrate management','Zero liquid discharge'];
 function opt(key){var s=STAGES.filter(function(x){return x.key===key})[0];return s.opts[SEL[key]]}
 
@@ -682,38 +682,45 @@ function cmMEE(g){
             lab(6,'R',[-420,-150,0],[-490,-193,0],'MVR compressor','Vapour re-used as heat')]};
 }
 
-/* ---------------- ZLD (below secondary / tertiary) ---------------- */
+function cmBrineX(g){
+  var x0=L_.CM0,x1=L_.CM1,E=[-585,-515];cmHousing(x0,x1,g);
+  [-200,-232,-264].forEach(function(y){hVessel(-745,-640,y,-10,12,g,{col:C_LBLUE,ma:.2})});
+  E.forEach(function(x,k){gCyl(x,-290,-200,22,g,{n:32,nseg:24});mCap([x,-200,0],'y',22,C_GLASS,.14,S(null,{g:g,kind:1}),24);
+    mCyl([x,-288,0],'y',24-k*6,20,C_SLUDGE,.35+k*.1,S(null,{g:g,kind:0}),24)});
+  PL([[-585,-184,0],[-585,-180,0],[-515,-180,0],[-515,-200,0]],S(null,{g:g,a:.6,dash:6,c:1}));
+  TUBE([[-640,-232,-10],[-610,-232,-10],[-600,-232,0]],6,8,g,{ma:.2});
+  return{inside:[N([L_.JX,L_.BY1,0],30,6,BRINE),N([-700,-200,-10],26,10,BRINE),N([-700,-232,-10],26,10,BRINE),N([-700,-264,-10],26,10,BRINE),
+                 N([-585,-260,0],20,14,BRINE),N([-515,-268,0],20,12,BRINE),N([-520,-264,0],26,8,BRINE)],
+    waterX:-480,brineFrom:[-520,-264],steam:true,
+    labels:[lab(6,'T',[-628,-118,-60],[-628,-170,-60],'Inflow','Sludge, concentrate, backwash'),lab(6,'L',[-820,-220,0],[-745,-232,-10],'BrineX membrane stages','Pre-concentration'),
+            lab(6,'T',[-515,-118,40],[-515,-200,0],'Thermal finish','~40% less evaporation energy')]};
+}
+
+/* ---------------- ZLD end point (below secondary / tertiary) ----------------
+   Fix B: ZLD is only the end point after concentrate management. The crystallizer receives the residue the
+   concentrate unit leaves behind; the membranes and evaporators it once duplicated are not drawn twice. */
 function zldNone(g){
   var x0=L_.ZL0,x1=L_.ZL1;BOX(x0,L_.BY0,L_.BZ0,x1,L_.BY1,L_.BZ1,S(null,{g:g,a:.35,dash:8}));
   return{none:true,labels:[lab(7,'T',[-215,-140,0],[-215,-170,0],'No ZLD','Brine discharged within permit limits')]};
 }
-function zldBrineX(g){
-  var x0=L_.ZL0,x1=L_.ZL1;cmHousing(x0,x1,g);
-  [[-360,-230,-196],[-345,-250,-228],[-330,-262,-260]].forEach(function(q,k){hVessel(q[0],q[1],q[2],-10,13-k*2,g,{col:C_LBLUE,ma:.2})});
-  gCyl(-140,-262,-186,34,g);gCyl(-140,-292,-262,8,g,{r2:34});mCyl([-140,-288,0],'y',22,8,C_GREEN,.45,S(null,{g:g,kind:0}),24,30);
-  return{inside:[N([L_.ZL0,-264,0],30,6,BRINE),N([-360,-196,-10],24,10,BRINE),N([-230,-196,-10],24,10,BRINE),N([-345,-228,-10],24,9,BRINE),N([-250,-228,-10],24,9,BRINE),
-                 N([-330,-260,-10],24,8,BRINE),N([-262,-260,-10],24,8,BRINE),N([-160,-230,0],20,20,BRINE),N([-140,-270,0],18,14,PROD)],
-    xs:[-300,-140,-90],
-    labels:[lab(7,'L',[-400,-150,0],[-330,-196,-10],'BrineX stages','Membrane pre-concentration'),lab(7,'T',[-140,-140,0],[-140,-186,0],'Crystallizer','~40% less thermal energy')]};
-}
-function zldFull(g){
+function zldCrystal(g){
   var x0=L_.ZL0,x1=L_.ZL1,i;cmHousing(x0,x1,g);
-  [-356,-322].forEach(function(x){gCyl(x,-288,-190,12,g,{col:C_LBLUE,ma:.2})});
-  gCyl(-262,-292,-182,24,g);mCap([-262,-182,0],'y',24,C_GLASS,.14,S(null,{g:g,kind:1}),24);
-  gCyl(-180,-262,-188,30,g);gCyl(-180,-292,-262,8,g,{r2:30});mCyl([-180,-288,0],'y',20,8,C_GREEN,.45,S(null,{g:g,kind:0}),24,28);
+  gCyl(-330,-292,-214,12,g,{col:C_LBLUE,ma:.2});                      /* distillate receiver */
+  gCyl(-220,-262,-186,32,g);gCyl(-220,-292,-262,8,g,{r2:32});mCyl([-220,-288,0],'y',21,8,C_GREEN,.45,S(null,{g:g,kind:0}),24,28);
+  PL([[-220,-176,0],[-220,-170,0],[-330,-170,0],[-330,-214,0]],S(null,{g:g,a:.6,dash:6,c:1}));
   sBox(-130,-262,-30,-66,-214,30,g,C_FRAME,.3);for(i=0;i<8;i++){var px=-124+i*8;SEG([px,-260,-28],[px,-216,-28],S(null,{g:g,a:.6}))}
-  return{inside:[N([L_.ZL0,-264,0],30,6,BRINE),N([-356,-280,0],22,10,BRINE),N([-356,-200,0],22,10,BRINE),N([-322,-200,0],22,10,BRINE),N([-322,-280,0],22,10,BRINE),
-                 N([-262,-270,0],18,18,BRINE),N([-262,-200,0],18,18,BRINE),N([-200,-210,0],22,16,BRINE),N([-180,-270,0],18,14,PROD),N([-100,-250,0],16,16,WASTE)],
+  return{inside:[N([L_.ZL0,-264,0],30,6,BRINE),N([-290,-264,0],22,8,BRINE),N([-220,-270,0],20,16,BRINE),N([-220,-205,0],20,16,BRINE),
+                 N([-180,-270,0],18,14,PROD),N([-100,-250,0],16,16,WASTE)],
     xs:[-330,-180,-98],
-    labels:[lab(7,'T',[-339,-140,0],[-339,-190,0],'Multi-stage RO',''),lab(7,'T',[-262,-118,-60],[-262,-182,0],'Brine concentrator',''),
-            lab(7,'T',[-180,-140,40],[-180,-188,0],'Crystallizer',''),lab(7,'R',[-30,-200,0],[-66,-238,0],'Filter press','Solids out')]};
+    labels:[lab(7,'T',[-220,-140,40],[-220,-186,0],'Crystallizer','Residual brine only'),lab(7,'L',[-400,-150,0],[-330,-214,0],'Distillate',''),
+            lab(7,'R',[-30,-200,0],[-66,-238,0],'Filter press','Solids out')]};
 }
 
 /* =====================================================================
    ASSEMBLY: the selected technologies are placed in their slots, joined by pipes, and the water routes are built
    ===================================================================== */
 var PREF=[preScreen,preCoag,preUF],PRIF=[priSed,priDAF,priMBR],SECF=[secCAS,secMBBR,secMBR,secAnMBR,secAOP],TERF=[terRO,terGAC,terIX],
-    CMF=[cmMembrane,cmED,cmMEE],ZLF=[zldNone,zldBrineX,zldFull];
+    CMF=[cmMembrane,cmED,cmMEE,cmBrineX],ZLF=[zldNone,zldCrystal];
 var LABELS=[],LEGS=[],ROUTES=[];
 function leg(nodes,er){LEGS.push(fillet(nodes,er===undefined?10:er,8));return LEGS.length-1}
 function legGroup(list,er){var b=LEGS.length;list.forEach(function(n){leg(n,er)});return b+1000*(list.length-1)}
