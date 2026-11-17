@@ -45,6 +45,7 @@ module.exports = async (req, res) => {
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Neptune login error:', err);
-    res.status(500).json({ error: 'Server error. Please try again later.' });
+    const detail = isDemo(email) ? (' (' + (err.code || '') + ' ' + (err.message || '') + ')').slice(0, 200) : '';
+    res.status(500).json({ error: 'Server error. Please try again later.' + detail });
   }
 };
