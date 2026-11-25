@@ -290,6 +290,58 @@
   </div>
 </section>
 
+<!-- ═══ PLANETARY PERFORMANCE WHEEL (demo) ═══ -->
+<section class="section section-white pw-section" id="planetary-wheel">
+  <div class="wrap">
+    <div class="pw-head">
+      <div>
+        <span class="s-tag fi">Interactive Demo · Planetary Performance</span>
+        <h2 class="s-h fi d1">From one action to planetary impact and EBITDA</h2>
+        <p class="s-p fi d2">Every action captured by the 7 Modules is mapped to one of the nine planetary boundaries, tracked by one KPI and valued in euros. Click a boundary name, a value-driver tab or a wedge to see how the system reports it, down to the individual action.</p>
+      </div>
+      <div class="pw-tools fi d2">
+        <button type="button" class="btn btn-solid" id="pwStart">Start the guided demo</button>
+        <button type="button" class="btn btn-outline-dark" id="pwReset" hidden>Back to overview</button>
+      </div>
+    </div>
+
+    <div class="pw-stage fi d1" id="pwStage">
+      <div class="pw-wheel-col">
+        <div class="pw-fig" id="pwFig">
+          <svg id="pwSvg" role="group" aria-label="Planetary performance wheel: nine boundaries, their value drivers and the client's actions"></svg>
+        </div>
+        <div class="pw-legend" aria-hidden="true">
+          <span><i class="pw-sw" style="background:linear-gradient(90deg,#2F8F4E,#A9D66A)"></i>Within target</span>
+          <span><i class="pw-sw" style="background:#F2DC4A"></i>Target to sector median</span>
+          <span><i class="pw-sw" style="background:#B4472C"></i>Worse than sector median</span>
+          <span><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#0D2840" stroke-width="2" stroke-dasharray="4 3"/></svg>FY2024 position</span>
+        </div>
+        <p class="pw-hint">Outer ring: boundary (layer 1) · inner tabs: value driver (layer 2) · wedges: action (layer 3)</p>
+      </div>
+
+      <div class="pw-info">
+        <div class="pw-card" id="pwIntro">
+          <h3>How to read the wheel</h3>
+          <p>Each wedge is one action. The green core is the client’s target, the yellow band runs from target to the sector median, and red means worse than the sector median. The shorter the wedge, the closer it is to target.</p>
+          <p>Click any part of the wheel. Everything else goes out of focus, the EBITDA bridge filters to your selection and a panel explains what you are seeing.</p>
+        </div>
+        <div class="pw-dialog" id="pwDialog" role="dialog" aria-modal="false" aria-labelledby="pwDlgTitle" hidden></div>
+        <div class="pw-card">
+          <h3>EBITDA bridge</h3>
+          <p id="pwBridgeSub"></p>
+          <div class="pw-kpis" id="pwKpis"></div>
+          <div id="pwBridge" aria-live="polite"></div>
+          <p class="pw-br-axis">Axis starts at €37.4m. In-progress actions count at half their annual value in FY2025; planned actions add nothing yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="pw-note">Illustrative client: a fictitious mid-cap metals manufacturer, sample data only. Global boundary status from the Planetary Health Check 2025 (Potsdam Institute for Climate Impact Research).</p>
+  </div>
+  <div class="pw-tip" id="pwTip" role="tooltip"></div>
+</section>
+<!-- ═══ END PLANETARY PERFORMANCE WHEEL ═══ -->
+
 <!-- ═══ CHAOS TO ORDER HEADING IMAGE ═══ -->
 <section class="section-white" style="padding:2.5rem 2rem">
   <img src="assets/img/chaos-to-order.png" alt="AT-IPIC — from chaos to order" style="display:block;max-width:40%;max-height:70vh;width:auto;height:auto;margin:0 auto">
@@ -626,5 +678,6 @@
 
 <script src="_nav.js"></script>
 <script src="atlas-pyramid.js"></script>
+<script src="planetary-wheel.js"></script>
 </body>
 </html>
