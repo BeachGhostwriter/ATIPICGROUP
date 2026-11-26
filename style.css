@@ -774,6 +774,7 @@ footer { background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800)
 .hx-inner { max-width: 1320px; margin: 0 auto; padding: 9rem 2rem 5rem; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; }
 .hx-h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; color: #fff; line-height: 1.12; letter-spacing: -0.01em; margin-bottom: 1.4rem; }
 .hx-h1 em { font-style: normal; color: var(--blue-300); }
+.hx-h1-3 { display: block; margin-top: 0.7rem; font-size: 0.62em; font-weight: 600; color: var(--sage-300); line-height: 1.25; }
 .hx-sub { font-size: 1.1rem; color: rgba(255,255,255,0.88); line-height: 1.72; max-width: 560px; margin-bottom: 2rem; }
 .hx-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2.25rem; }
 .hx-door { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.95rem 1.05rem; border-radius: 16px; text-decoration: none; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.26); transition: all 0.22s; }
